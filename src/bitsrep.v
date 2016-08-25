@@ -211,9 +211,6 @@ else None.
 (* Zero extend by {extra} bits *)
 Definition zeroExtend extra {n} (p: BITS n) := zero extra ## p.
 
-Coercion WORDtoDWORD := zeroExtend (n:=16) 16 : WORD -> DWORD.
-Coercion BYTEtoDWORD := zeroExtend (n:=8) 24 : BYTE -> DWORD.
-
 (* Take m least significant bits of n-bit argument and fill with zeros if m>n *)
 Fixpoint lowWithZeroExtend m {n} : BITS n -> BITS m :=
   if n is _.+1
@@ -266,6 +263,25 @@ Definition slice n n1 n2 (p: BITS (n+n1+n2)) : BITS n1 :=
 
 Definition updateSlice n n1 n2 (p: BITS (n+n1+n2)) (m:BITS n1) : BITS (n+n1+n2) :=
   let: (a,b,c) := split3 n2 n1 n p in a ## m ## c.
+
+(* Little-endian conversion of n-tuples of bytes (first component is least significant)
+   into BITS (n*8) *)
+Fixpoint seqBytesToBits (xs : seq BYTE) : BITS (size xs*8) :=
+  if xs is x::xs' return BITS (size xs*8) then seqBytesToBits xs' ## x
+  else nilB.
+
+Fixpoint bytesToBits {n} : (n.-tuple BYTE) -> BITS (n*8) :=
+  if n is n'.+1 return n.-tuple BYTE -> BITS (n*8) 
+  then fun xs => bytesToBits (behead_tuple xs) ## (thead xs)
+  else fun xs => nilB.
+
+Definition splitAtByte n (bits : BITS ((n.+1)*8)) :BITS (n*8) * BYTE := (split2 (n*8) 8 bits).
+
+Fixpoint bitsToBytes n : BITS (n*8) -> n.-tuple BYTE :=
+  if n is n'.+1 return BITS (n*8) -> n.-tuple BYTE
+  then fun xs => 
+    let (hi,lo) := splitAtByte n' xs in cons_tuple lo (bitsToBytes _ hi)
+  else fun xs => nil_tuple _. 
 
 (*---------------------------------------------------------------------------
     Single bit operations
@@ -412,20 +428,8 @@ Notation "#x y" := (fromHex y) (at level 0).
 Notation "#b y" := (fromBin y) (at level 0).
 Notation "#c y" := (fromString y : BYTE) (at level 0).
 
-(*=fortytwo *)
+
 Example fortytwo  := #42 : BYTE.
 Example fortytwo1 := #x"2A".
 Example fortytwo2 := #b"00101010".
 Example fortytwo3 := #c"*".
-(*=End *)
-
-
-
-
-
-
-
-
-
-
-
