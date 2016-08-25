@@ -4,10 +4,18 @@
   so Leibniz equality coincides with extensional equality
   ===========================================================================*)
 
-Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq choice fintype tuple finfun.
 
-Require Import bitsrep.
+Require Import mathcomp.ssreflect.ssreflect.
+From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun.
+
+Require Import bitsrep pmap reader writer.
+
+Local Open Scope update_scope.
+
+Set Implicit Arguments.
+Unset Strict Implicit.
+Import Prenex Implicits.
+
 
 
 

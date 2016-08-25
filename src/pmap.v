@@ -14,7 +14,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-(* Binary maps: a PMAP V n is a partial map from BITS n to values in V *)
+(* Binary maps: a (PMAP V n) is a partial map from (BITS n) to values in V *)
 Section Maps.
 
 (* Non-empty maps, possibly-empty maps *)
@@ -66,6 +66,7 @@ Inductive PMAP n :=
 
   Definition updatePMap n (m: PMAP n) (p: BITS n) (v: V) :=
   if m is PMap m' then PMap (updateNE m' p v) else PMap (singleNE p v).
+
 
   (* Remove an element from the map if it is present *)
   Fixpoint removeNE n (m: NEPMAP n) : BITS n -> option (NEPMAP n) :=

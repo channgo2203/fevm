@@ -6,7 +6,7 @@
 Require Import mathcomp.ssreflect.ssreflect.
 
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq tuple.
-Require Import bitsrep.
+Require Import bitsrep common_definitions.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -15,8 +15,6 @@ Import Prenex Implicits.
 (*---------------------------------------------------------------------------
     Increment and decrement operations
   ---------------------------------------------------------------------------*)
-
-Notation eta_expand x := (fst x, snd x).
 
 Fixpoint incB {n} : BITS n -> BITS n :=
   if n is n.+1
@@ -153,7 +151,6 @@ Definition rolB {n} (p: BITS n.+1) := let (b, p) := eta_expand (splitmsb p) in j
 (* Shift right: shift everything right and put 0 in msb *)
 Definition shrB {n} : BITS n -> BITS n :=
   if n is n.+1 then fun p =>  joinmsb0 (droplsb (n:=n) p) else fun p => nilB.
-Definition shrBn {n} (p: BITS n)(k: nat): BITS n := iter k shrB p.
 
 (* Arithmetic shift right: shift one bit to the right, copy msb *)
 Definition sarB {n} (p: BITS n.+1) := joinmsb (msb p, droplsb p).
@@ -163,7 +160,6 @@ Definition shlBaux {n} (p: BITS n) : BITS n.+1  := joinlsb (p, false).
 
 (* Shift left: shift one bit to the left, put 0 in lsb, lose msb *)
 Definition shlB {n} (p: BITS n)  := dropmsb (shlBaux p).
-Definition shlBn {n} (p: BITS n)(k: nat): BITS n := iter k shlB p.
 
 (*---------------------------------------------------------------------------
     Iteration and ranges
@@ -185,25 +181,3 @@ Definition bIterFrom {n A} (p c: BITS n) (f: BITS n -> A -> A) x :=
 (* Ranges *)
 Definition bIota {n} (p m: BITS n) : seq (BITS n) := rev (bIterFrom p m cons nil).
 Definition bRange {n} (p q: BITS n) := bIota p (subB q p).
-
-(*---------------------------------------------------------------------------
-    Notations
-  ---------------------------------------------------------------------------*)
-
-Module BitsNotations.
-Infix "<<" := shlBn (at level 30, no associativity) : bits_scope.
-Infix ">>" := shrBn (at level 30, no associativity) : bits_scope.
-Infix "|" := orB (at level 40, left associativity) : bits_scope.
-Infix "&" := andB (at level 40, left associativity) : bits_scope.
-(*Infix "^" := xorB (at level 40, left associativity) : bits_scope.*)
-Notation "n + m" := (addB n m) : bits_scope.
-Notation "m .+1" := (incB m) : bits_scope.
-Notation "m .-1" := (decB m) : bits_scope.
-Notation "- m" := (negB m) : bits_scope.
-Notation "~ m" := (invB m) : bits_scope.
-End BitsNotations.
-
-Open Scope bits_scope.
-Delimit Scope bits_scope with bits.
-Bind Scope bits_scope with BITS.
-

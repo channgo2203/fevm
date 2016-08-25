@@ -160,37 +160,33 @@ Definition zero n := copy n false.
 
 Definition ones n := copy n true.
 
-(* Concatenation and spliting of bits strings *)
-(* Most and least significant bits, default to 0 *)
-Definition msb {n} (b : BITS n) :=
-last false b.
+(*---------------------------------------------------------------------------
+    Concatenation and splitting of bit strings
+  ---------------------------------------------------------------------------*)
 
-Definition lsb {n} (b : BITS n) :=
-head false b.
+(* Most and least significant bits, defaulting to 0 *)
+Definition msb {n} (b: BITS n) := last false b.
+Definition lsb {n} (b: BITS n) := head false b.
 
-Definition catB {n1 n2} (p1 : BITS n1) (p2 : BITS n2) : BITS (n2+n1) :=
-cat_tuple p2 p1.
-
+Definition catB {n1 n2} (p1: BITS n1) (p2: BITS n2) : BITS (n2+n1) :=
+  cat_tuple p2 p1.
 Notation "y ## x" := (catB y x) (right associativity, at level 60).
 
-(* Return n high bits *)
+(* The n high bits *)
 Fixpoint high n {n2} : BITS (n2+n) -> BITS n :=
-if n2 is _.+1 
-then fun p => let (p,b) := splitlsb p in high _ p 
-else fun p => p.
+  if n2 is _.+1 then fun p => let (p,b) := splitlsb p in high _ p else fun p => p.
 
-(* Return n low bits *)
+(* The n low bits *)
 Fixpoint low {n1} n : BITS (n+n1) -> BITS n :=
-if n is _.+1 
-then fun p => let (p,b) := splitlsb p in joinlsb (low _ p, b)
-else fun p => nilB.
+  if n is _.+1 then fun p => let (p,b) := splitlsb p in joinlsb (low _ p, b)
+               else fun p => nilB.
 
-(* Return n1 high and n2 low bits *)
+(* n1 high and n2 low bits *)
 Definition split2 n1 n2 p := (high n1 p, low n2 p).
 
 Definition split3 n1 n2 n3 (p: BITS (n3+n2+n1)) : BITS n1 * BITS n2 * BITS n3 :=
-let (hi,lo) := split2 n1 _ p in
-let (lohi,lolo) := split2 n2 _ lo in (hi,lohi,lolo).
+  let (hi,lo) := split2 n1 _ p in
+  let (lohi,lolo) := split2 n2 _ lo in (hi,lohi,lolo).
 
 Definition split4 n1 n2 n3 n4 (p: BITS (n4+n3+n2+n1)): BITS n1 * BITS n2 * BITS n3 * BITS n4 :=
   let (b1,rest) := split2 n1 _ p in
@@ -198,18 +194,20 @@ Definition split4 n1 n2 n3 n4 (p: BITS (n4+n3+n2+n1)): BITS n1 * BITS n2 * BITS 
   let (b3,b4)   := split2 n3 _ rest in (b1,b2,b3,b4).
 
 (* Sign extend by {extra} bits *)
-Definition signExtend extra {n} (p: BITS n.+1) := 
-copy extra (msb p) ## p.
+Definition signExtend extra {n} (p: BITS n.+1) := copy extra (msb p) ## p.
 
 (* Truncate a signed integer by {extra} bits; return None if this would overflow *)
 Definition signTruncate extra {n} (p: BITS (n.+1 + extra)) : option (BITS n.+1) :=
-let (hi,lo) := split2 extra _ p in
-if msb lo && (hi == ones _) || negb (msb lo) && (hi == zero _)
-then Some lo
-else None.
+  let (hi,lo) := split2 extra _ p in
+  if msb lo && (hi == ones _) || negb (msb lo) && (hi == zero _)
+  then Some lo
+  else None.
 
 (* Zero extend by {extra} bits *)
 Definition zeroExtend extra {n} (p: BITS n) := zero extra ## p.
+
+Coercion WORDtoDWORD := zeroExtend (n:=16) 16 : WORD -> DWORD.
+Coercion BYTEtoDWORD := zeroExtend (n:=8) 24 : BYTE -> DWORD.
 
 (* Take m least significant bits of n-bit argument and fill with zeros if m>n *)
 Fixpoint lowWithZeroExtend m {n} : BITS n -> BITS m :=
@@ -263,25 +261,6 @@ Definition slice n n1 n2 (p: BITS (n+n1+n2)) : BITS n1 :=
 
 Definition updateSlice n n1 n2 (p: BITS (n+n1+n2)) (m:BITS n1) : BITS (n+n1+n2) :=
   let: (a,b,c) := split3 n2 n1 n p in a ## m ## c.
-
-(* Little-endian conversion of n-tuples of bytes (first component is least significant)
-   into BITS (n*8) *)
-Fixpoint seqBytesToBits (xs : seq BYTE) : BITS (size xs*8) :=
-  if xs is x::xs' return BITS (size xs*8) then seqBytesToBits xs' ## x
-  else nilB.
-
-Fixpoint bytesToBits {n} : (n.-tuple BYTE) -> BITS (n*8) :=
-  if n is n'.+1 return n.-tuple BYTE -> BITS (n*8) 
-  then fun xs => bytesToBits (behead_tuple xs) ## (thead xs)
-  else fun xs => nilB.
-
-Definition splitAtByte n (bits : BITS ((n.+1)*8)) :BITS (n*8) * BYTE := (split2 (n*8) 8 bits).
-
-Fixpoint bitsToBytes n : BITS (n*8) -> n.-tuple BYTE :=
-  if n is n'.+1 return BITS (n*8) -> n.-tuple BYTE
-  then fun xs => 
-    let (hi,lo) := splitAtByte n' xs in cons_tuple lo (bitsToBytes _ hi)
-  else fun xs => nil_tuple _. 
 
 (*---------------------------------------------------------------------------
     Single bit operations
@@ -428,8 +407,9 @@ Notation "#x y" := (fromHex y) (at level 0).
 Notation "#b y" := (fromBin y) (at level 0).
 Notation "#c y" := (fromString y : BYTE) (at level 0).
 
-
+(*=fortytwo *)
 Example fortytwo  := #42 : BYTE.
 Example fortytwo1 := #x"2A".
 Example fortytwo2 := #b"00101010".
 Example fortytwo3 := #c"*".
+(*=End *)

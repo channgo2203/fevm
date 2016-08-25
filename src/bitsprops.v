@@ -98,11 +98,6 @@ Proof. have H:= divn_eq m (2^n). rewrite {1}H.
 have HH:= @fromNat_wrapMany n (m %/ 2^n) (m %% 2^n). rewrite addnC in HH. rewrite -HH.
 rewrite toNat_fromNatBounded. done. apply ltn_pmod. apply expn_gt0. Qed.
 
-(* TODO: remove *)
-Lemma splitTuple {X n} {a b:X} {c d:n.-tuple X} : cons_tuple a c = cons_tuple b d -> a = b /\ c = d.
-Proof. move => H. split. by inversion H. apply val_inj. by inversion H. Qed.
-
-
 Lemma fromNat_succn n : forall b c, @fromNat n b = fromNat c -> @fromNat n (b.+1) = fromNat(c.+1).
 Proof. induction n => //.
 move => b c EQ. rewrite /fromNat-/fromNat. rewrite /fromNat-/fromNat in EQ.
@@ -212,71 +207,12 @@ assert (neq' : i <> i') by  intuition.
 specialize (IHn p _ _ b lt lt' neq'). apply IHn.
 Qed.
 
-Lemma getBit_joinmsb :
-  forall n (bs: BITS n) k,
-    k <= n ->
-    getBit (joinmsb (false , bs)) k = getBit bs k.
-Proof.
-  elim=> [|n IHn] bs k leq_k_n.
-  - (* Case: n ~ 0 *)
-    rewrite leqn0 in leq_k_n.
-    move/eqP: leq_k_n=> ->.
-    by rewrite !tuple0.
-  - (* Case: n ~ n.+1 *)
-    case/tupleP: bs=> [b bs].
-    case: k leq_k_n => [|k leq_k_n].
-    + (* Case: k ~ 0 *)
-      by trivial.
-    + (* Case: k ~ k.+1 *)
-      rewrite /joinmsb/splitlsb tuplehelp.beheadCons
-              tuplehelp.theadCons -/joinmsb /joinlsb //=.
-      by apply: IHn; assumption.
-Qed.
-
-Lemma getBit_dropmsb:
-  forall n (bs : BITS n.+1) k, k < n ->
-    getBit (dropmsb bs) k = getBit bs k.
-Proof.
-  elim=> // n /= IHn /tupleP[b bs] k le_k.
-  rewrite /dropmsb /splitmsb /=
-          tuplehelp.theadCons tuplehelp.beheadCons /=
-          -/splitmsb.
-  set cr := splitmsb bs; rewrite (surjective_pairing cr).
-  have ->: ((cr.1, joinlsb (cr.2, b))).2 = joinlsb (dropmsb bs, b)
-    by rewrite /dropmsb.
-  case: k le_k => // k le_k.
-  + (* k ~ k + 1 *)
-    have H: forall bs', getBit (joinlsb (bs', b)) k.+1 = getBit bs' k by compute.
-    by rewrite !H; auto with arith.
-Qed.
-
 (*---------------------------------------------------------------------------
     Properties of all zeroes and all ones
   ---------------------------------------------------------------------------*)
 Lemma fromNat0 n : #0 = zero n.
 Proof. induction n; first apply trivialBits.
 + rewrite /zero /copy. rewrite /zero /copy in IHn. by rewrite /fromNat-/fromNat IHn nseqCons.
-Qed.
-
-Lemma count_ones:
-  forall n, (count_mem true (ones n)) = n.
-Proof.
-  elim=> //=.
-  auto with arith.
-Qed.
-
-Lemma getBit_zero:
-  forall n k, getBit (n := n) #0 k = false.
-Proof.
-  move=> n k.
-  rewrite fromNat0 /zero /copy /getBit nth_nseq if_same //.
-Qed.
-
-Lemma getBit_ones:
-  forall n k, k < n -> getBit (ones n) k = true.
-Proof.
-  move=> n k le_k.
-  by rewrite /getBit nth_nseq le_k.
 Qed.
 
 Lemma toNat_zero n : toNat (zero n) = 0.
@@ -471,6 +407,7 @@ rewrite (IHn p q). done.
 move => i LT. apply (H i.+1 LT). 
 Qed. 
 
+Require Import tuplehelp. 
 Lemma lowBitsEq n1 n2 (p q: BITS (n1+n2)) : 
   (forall i, i < n1 -> getBit p i = getBit q i) <-> low n1 p = low n1 q.
 Proof. induction n1 => //=.
@@ -526,29 +463,6 @@ move => H i. move/andP => [LE LT].
 specialize (H i LE). by rewrite 2!getBit_low LT in H. 
 Qed. 
 
-Lemma getUpdateSlice n1 n2 n3 (p: BITS (n1+n2+n3)) (q: BITS n2) :
-  slice n1 n2 n3 (updateSlice _ _ _ p q) = q.
-Proof. rewrite /slice/updateSlice/split3/split2.
-by rewrite low_catB high_catB.
-Qed.
-
-Lemma bitsToBytesK n : cancel (@bitsToBytes n) (@bytesToBits n).
-Proof. induction n.
-+ move => x. by rewrite (tuple0 _) (tuple0 x). 
-+ move => xs. rewrite /bitsToBytes-/bitsToBytes.
-rewrite /splitAtByte. rewrite (split2eta xs) split2app. 
-by rewrite /bytesToBits-/bytesToBits beheadCons theadCons IHn. 
-Qed. 
-
-Lemma bytesToBitsK n : cancel (@bytesToBits n) (@bitsToBytes n).
-Proof. induction n.
-+ move => x. by rewrite (tuple0 _) (tuple0 x). 
-+ move => xs. rewrite /bitsToBytes-/bitsToBytes/splitAtByte. 
-rewrite (split2eta (bytesToBits xs)) split2app. 
-case/tupleP: xs => [x xs].
-rewrite /bytesToBits-/bytesToBits beheadCons theadCons. 
-by rewrite high_catB IHn low_catB. Qed. 
-
 (*---------------------------------------------------------------------------
     Zero and sign extension
   ---------------------------------------------------------------------------*)
@@ -585,45 +499,11 @@ have EQ: low n p = q by congruence. subst.
 by rewrite (eqP P).
 Qed.
 
-
-
 Lemma toNat_zeroExtend extra n (p: BITS n) : toNat (zeroExtend extra p) = toNat p.
 Proof. rewrite /zeroExtend. rewrite toNatCat. by rewrite toNat_zero. Qed.
 
 Lemma toNat_zeroExtendAux extra n (p: BITS n) : toNat (zeroExtendAux extra p) = toNat p.
 Proof. induction extra => //. by rewrite /= toNat_joinmsb0 IHextra. Qed.
-
-Lemma zeroExtend_fromNat extra n m : 
-  m < 2^n ->
-  zeroExtend extra (fromNat (n:=n) m) = #m. 
-Proof. move => LT. 
-apply toNat_inj. rewrite toNat_zeroExtend. rewrite toNat_fromNatBounded => //. 
-rewrite toNat_fromNatBounded => //. 
-rewrite expnD. 
-apply (leq_trans LT). apply leq_pmulr. apply expn_gt0. 
-Qed.
-
-Lemma msbNonNil n (p: BITS n.+1) b : msb p = last b p. 
-Proof. by case/tupleP: p => b' q. Qed. 
-
-Lemma splitmsb_msb n (p:BITS n.+1) : (splitmsb p).1 = msb p.
-Proof. induction n. 
-+ case/tupleP: p => b q. by rewrite (tuple0 q)/= theadCons. 
-+ case/tupleP: p => b q. rewrite /= beheadCons theadCons. case E: (splitmsb q) => [b' q'].
-specialize (IHn q). rewrite E/= in IHn. simpl. rewrite (msbNonNil q b) in IHn. by subst. 
-Qed. 
-
-Lemma signExtend_fromNat extra n m : 
-  m < 2^n ->
-  signExtend extra (fromNat (n:=n.+1) m) = #m. 
-Proof. move => LT. 
-unfold signExtend. rewrite -splitmsb_msb. 
-rewrite splitmsb_fromNat. simpl. 
-rewrite divn_small => //. simpl. 
-replace (copy extra false ## (fromNat (n:=n.+1) m)) with (zeroExtend extra (fromNat (n:=n.+1) m)). apply zeroExtend_fromNat. rewrite expnS. 
-apply: (ltn_trans LT). apply ltn_Pmull => //. apply expn_gt0. 
-done. 
-Qed. 
 
 (*---------------------------------------------------------------------------
     Properties of equality
