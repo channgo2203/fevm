@@ -1,14 +1,14 @@
 (*===========================================================================
-  Representation of partial finite maps whose domain is BITS n
-  We use a representation that is sparse, has O(n) lookup, and is canonical
-  so Leibniz equality coincides with extensional equality
+    Model for the EVM memory
+
+    Note that operations are partial, as not all memory is mapped. 
+	 Each memory cell is a BYTE.
   ===========================================================================*)
-
-
+  
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun.
 
-Require Import bitsrep pmap reader writer.
+Require Import bitsrep bitsops cursor pmap reader writer.
 
 Local Open Scope update_scope.
 

@@ -1,7 +1,8 @@
 (* Instructions and structures representing programs *)
 
-Require Import String.
-Require Import List.
-Require Import FMapInterface.
+From mathcomp Require Import all_ssreflect.
+Require Import bitsops bitsrep instr instrsyntax monad reader writer.
+
+
 
 	
