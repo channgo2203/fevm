@@ -193,6 +193,31 @@ Definition split4 n1 n2 n3 n4 (p: BITS (n4+n3+n2+n1)): BITS n1 * BITS n2 * BITS 
   let (b2,rest) := split2 n2 _ rest in
   let (b3,b4)   := split2 n3 _ rest in (b1,b2,b3,b4).
 
+Definition split8 n1 n2 n3 n4 n5 n6 n7 n8 (p: BITS (n8+n7+n6+n5+n4+n3+n2+n1)): BITS n1 * BITS n2 * BITS n3 * BITS n4 * BITS n5 * BITS n6 * BITS n7 * BITS n8 :=
+  let '(b1,b2,b3,rest) := split4 n1 n2 n3 _ p in
+  let '(b4,b5,b6,rest) := split4 n4 n5 n6 _ rest in
+  let '(b7,b8) := split2 n7 n8 rest in (b1,b2,b3,b4,b5,b6,b7,b8).
+
+Definition split16 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 n15 n16 (p: BITS (n16+n15+n14+n13+n12+n11+n10+n9+n8+n7+n6+n5+n4+n3+n2+n1)): 
+BITS n1 * BITS n2 * BITS n3 * BITS n4 * BITS n5 * BITS n6 * BITS n7 * BITS n8 * BITS n9 * BITS n10 * BITS n11 * BITS n12 * BITS n13 * BITS n14 * BITS n15 * BITS n16 :=
+  let '(b1,b2,b3,b4,b5,b6,b7,rest) := split8 n1 n2 n3 n4 n5 n6 n7 _ p in
+  let '(b8,b9,b10,b11,b12,b13,b14,rest) := split8 n8 n9 n10 n11 n12 n13 n14 _ rest in
+  let '(b15,b16) := split2 n15 n16 rest in (b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,b16).
+
+Definition split20 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 n15 n16 n17 n18 n19 n20 (p: BITS (n20+n19+n18+n17+n16+n15+n14+n13+n12+n11+n10+n9+n8+n7+n6+n5+n4+n3+n2+n1)): 
+BITS n1 * BITS n2 * BITS n3 * BITS n4 * BITS n5 * BITS n6 * BITS n7 * BITS n8 * BITS n9 * BITS n10 * BITS n11 * BITS n12 * BITS n13 * BITS n14 * BITS n15 * BITS n16 * BITS n17 * BITS n18 * BITS n19 * BITS n20 :=
+  let '(b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,rest) := split16 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 n15 _ p in
+  let '(b16,b17,b18,rest) := split4 n16 n17 n18 _ rest in
+  let '(b19,b20) := split2 n19 n20 rest in (b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,b16,b17,b18,b19,b20).
+
+Definition split32 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 n15 n16 n17 n18 n19 n20 n21 n22 n23 n24 n25 n26 n27 n28 n29 n30 n31 n32 
+(p: BITS (n32+n31+n30+n29+n28+n27+n26+n25+n24+n23+n22+n21+n20+n19+n18+n17+n16+n15+n14+n13+n12+n11+n10+n9+n8+n7+n6+n5+n4+n3+n2+n1)): 
+BITS n1 * BITS n2 * BITS n3 * BITS n4 * BITS n5 * BITS n6 * BITS n7 * BITS n8 * BITS n9 * BITS n10 * BITS n11 * BITS n12 * BITS n13 * BITS n14 * BITS n15 * BITS n16 * BITS n17 * BITS n18 * BITS n19 * BITS n20 * 
+BITS n21 * BITS n22 * BITS n23 * BITS n24 * BITS n25 * BITS n26 * BITS n27 * BITS n28 * BITS n29 * BITS n30 * BITS n31 * BITS n32 :=
+  let '(b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,rest) := split16 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 n15 _ p in
+  let '(b16,b17,b18,b19,b20,b21,b22,b23,b24,b25,b26,b27,b28,b29,b30,rest) := split16 n16 n17 n18 n19 n20 n21 n22 n23 n24 n25 n26 n27 n28 n29 n30 _ rest in
+  let '(b31,b32) := split2 n31 n32 rest in (b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,b11,b12,b13,b14,b15,b16,b17,b18,b19,b20,b21,b22,b23,b24,b25,b26,b27,b28,b29,b30,b31,b32).
+
 (* Sign extend by {extra} bits *)
 Definition signExtend extra {n} (p: BITS n.+1) := copy extra (msb p) ## p.
 
