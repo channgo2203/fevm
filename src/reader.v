@@ -15,11 +15,11 @@ Inductive ReaderTm T :=
 | readerRetn (x: T)
 | readerNext (rd: BYTE -> ReaderTm T)
 | readerSkip (rd: ReaderTm T)
-| readerCursor (rd: DWORDCursor -> ReaderTm T).
+| readerCursor (rd: EVMWORDCursor -> ReaderTm T).
 
 Class Reader T := getReaderTm : ReaderTm T.
 (*=End *)
-Instance readCursor : Reader (DWORDCursor) := readerCursor (fun p => readerRetn p).
+Instance readCursor : Reader (EVMWORDCursor) := readerCursor (fun p => readerRetn p).
 Definition readNext {T} {R: Reader T}: Reader T := R.
 
 Fixpoint readerBind X Y (r: Reader X) (f: X -> Reader Y) : Reader Y :=
@@ -66,7 +66,7 @@ Qed.
 (* Functional interpretation of reader on sequences.
    Returns the final position, the tail of the given sequence and the value
    read. *)
-Fixpoint runReader T (r:Reader T) (c:DWORDCursor) xs : option (DWORDCursor * seq BYTE * T) :=
+Fixpoint runReader T (r:Reader T) (c:EVMWORDCursor) xs : option (EVMWORDCursor * seq BYTE * T) :=
   match r with
   | readerRetn x => Some (c, xs, x)
   | readerNext rd =>
@@ -109,7 +109,7 @@ Instance readBYTE : Reader BYTE | 0 :=
   readerNext (fun b => readerRetn b).
 (*=End *)
 
-Lemma runReader_readBYTE (p: DWORD) byte bytes :
+Lemma runReader_readBYTE (p: EVMWORD) byte bytes :
   runReader readBYTE p (byte::bytes) =
   Some (next p, bytes, byte).
 Proof. done. Qed.

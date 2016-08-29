@@ -55,3 +55,80 @@ Instance MemUpdateOpsEVMWORD : UpdateOps Mem PTR EVMWORD :=
 Definition updateBYTE (m : Mem) (p : PTR) (b : BYTE) : option Mem :=
   if isMapped p m then Some (m !p := b)
   else None.
+
+(*-------------------------------------------------------------------------------------------- 
+ "readers of T" type:
+   
+   read m p = readerFail if memory at p in m is inaccessible for reading T
+   read m p = readerWrap if we tried to read beyond the end of memory
+   read m p = readerOk x q if memory between p inclusive and q exclusive represents x : X
+ --------------------------------------------------------------------------------------------*)
+Inductive readerResult T :=
+  readerOk (x : T) (q : EVMWORDCursor)
+| readerWrap
+| readerFail.
+
+Implicit Arguments readerOk [T].
+Implicit Arguments readerWrap [T].
+Implicit Arguments readerFail [T].
+
+Fixpoint readMem T (r : Reader T) (m : Mem) (pos : EVMWORDCursor) : readerResult T :=
+  match r with
+    | readerRetn x => readerOk x pos
+    | readerNext rd =>
+      if pos is mkCursor p then
+        if m p is Some x then readMem (rd x) m (next p)
+        else readerFail
+      else readerWrap
+    | readerSkip rd =>
+      if pos is mkCursor p then
+        if m p is Some x then readMem rd m (next p)
+        else readerFail
+      else readerWrap
+    | readerCursor rd =>
+      readMem (rd pos) m pos
+  end.
+(* Check readMem. *)
+
+(*--------------------------------------------------------------------------------------------
+   writer on sequences
+ ------------------------------------------------------------------------------------------- *)
+Fixpoint writeMemTm (w : WriterTm unit) (m : Mem) (pos : EVMWORDCursor) : option (EVMWORDCursor * Mem) :=
+  match w with
+    | writerRetn _ => Some (pos, m)
+    | writerNext byte w =>
+      if pos is mkCursor p then
+        if isMapped p m then
+          writeMemTm w (m!p := byte) (next p)
+        else None
+      else None
+    | writerSkip w =>
+      if pos is mkCursor p then
+        if isMapped p m then
+          writeMemTm w (m!p := #0) (next p)
+        else None
+      else None
+             
+      | writerCursor w =>
+        writeMemTm (w pos) m pos
+      | writerFail =>
+        None
+  end.
+
+Definition writeMem {T} (w : Writer T) (m : Mem) (pos : EVMWORDCursor) (t : T) : option (EVMWORDCursor * Mem) :=
+  writeMemTm (w t) m pos.
+
+Require Import Coq.Strings.String.
+Import Ascii.
+
+Fixpoint enumMemToString (xs : seq (EVMWORD * BYTE)) :=
+  (if xs is (p, b)::xs then
+     toHex p ++ ":=" ++ toHex b ++ ", " ++ enumMemToString xs
+   else "")%string.
+
+Definition memtoString (m : Mem) := enumMemToString (enumPMap m).
+
+Example m: Mem := (@EmptyPMap _ _) ! #5 := (#12 : BYTE) ! #8 := (#15 : BYTE).
+
+Compute (memtoString m).
+        

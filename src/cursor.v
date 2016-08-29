@@ -36,15 +36,16 @@ Definition next (p:BITS n) := if p == ones _ then top else mkCursor (incB p).
 Definition nextCursor (p:Cursor) :=
   if p is mkCursor pos then next pos else top.
 
-  (*---------------------------------------------------------------------------
+(*---------------------------------------------------------------------------
     Order relations on Cursor
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 Definition ltCursor (pos1 pos2: Cursor) :=
   match pos1, pos2 with
   | top, _ => false
   | mkCursor p1, mkCursor p2 => ltB p1 p2
   | mkCursor _, top => true
   end.
+
 Definition leCursor (pos1 pos2: Cursor) :=
   match pos1, pos2 with
   | _, top => true
@@ -62,6 +63,7 @@ Fixpoint nexts k (c: Cursor) : option (Cursor) :=
 (*---------------------------------------------------------------------------
     Apart by n
   ---------------------------------------------------------------------------*)
+(* Check q is apart n cells from p *)
 Fixpoint apart n (p q: Cursor) :=
   match n, p with
   | n'.+1, mkCursor p' => apart n' (next p') q (* q = next (p' +# n)  *)
@@ -85,34 +87,34 @@ Definition subCursor (p q: Cursor) : Cursor :=
     Range testing
   ---------------------------------------------------------------------------*)
 Definition inRange p q := fun p' => leCursor p p' && ltCursor p' q.
-Definition outRange p q := fun p' => ltCursor p' p && leCursor q p'.
+Definition outRange p q := fun p' => ltCursor p' p || leCursor q p'.
+
+(* This allows doing induction over leCursor *)
+Inductive LeCursor p : Cursor -> Prop :=
+| LeCursor_refl : LeCursor p p
+| LeCursor_next q : LeCursor p (mkCursor q) -> LeCursor p (next q).
 
 End Cursors.
 
 Coercion mkCursor : BITS >-> Cursor.
 
 (** Convenience definitions for various sizes of cursor *)
-(*Definition NIBBLECursor := Cursor n4.
-Definition BYTECursor   := Cursor n8.
-Definition WORDCursor   := Cursor n16.*)
 Definition DWORDCursor  := Cursor n32.
-(*Definition QWORDCursor  := Cursor n64.
-Definition DWORDorBYTECursor (d: bool) := Cursor (if d then n32 else n8).*)
+Definition ADDRESSCursor := Cursor n160.
+Definition EVMWORDCursor := Cursor n256.
 
-(*Coercion mkNIBBLECursor (x: NIBBLE) : NIBBLECursor := mkCursor x.
-Coercion mkBYTECursor   (x: BYTE)   : BYTECursor   := mkCursor x.
-Coercion mkWORDCursor   (x: WORD)   : WORDCursor   := mkCursor x.
-Coercion mkDWORDCursor  (x: DWORD)  : DWORDCursor  := mkCursor x.
-Coercion mkQWORDCursor  (x: QWORD)  : QWORDCursor  := mkCursor x.
-Coercion mkDWORDorBYTECursor d (x: DWORDorBYTE d) : DWORDorBYTECursor d := mkCursor x.*)
 
 Identity Coercion DWORDCursortoCursor32 : DWORDCursor >-> Cursor.
+Identity Coercion EVMWORDCursortoCurso256 : EVMWORDCursor >-> Cursor.
+
 
 Definition widenCursor n1 n2 (c: Cursor n1) : Cursor (n2+n1) :=
   if c is mkCursor p then mkCursor (p ## zero n2) else top _.
 
-(* Because Cursor is essentially isomorphic to option, we can inherit
-   many canonical structures. *)
+(*---------------------------------------------------------------------------
+   Because Cursor is essentially isomorphic to option, we can inherit
+   many canonical structures. 
+ ---------------------------------------------------------------------------*)
 Section CursorCanonicals.
   Variable n: nat.
 

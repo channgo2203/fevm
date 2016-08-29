@@ -17,7 +17,7 @@ Inductive WriterTm A :=
 | writerRetn (x: A)
 | writerNext (b: BYTE) (w: WriterTm A)
 | writerSkip (w: WriterTm A)
-| writerCursor (w: DWORDCursor -> WriterTm A)
+| writerCursor (w: EVMWORDCursor -> WriterTm A)
 | writerFail.
 Class Writer T := getWriterTm: T -> WriterTm unit.
 (*=End *)
@@ -62,11 +62,11 @@ Proof. apply Build_Monad.
     by rewrite IH.
 Qed.
 
-Definition getWCursor : WriterTm (DWORDCursor) := writerCursor (fun p => writerRetn p).
+Definition getWCursor : WriterTm (EVMWORDCursor) := writerCursor (fun p => writerRetn p).
 Definition writeNext {T} {W: Writer T}: Writer T := W.
 
 (* Functional interpretation of writer on sequences *)
-Fixpoint runWriterTm padSkip X (w: WriterTm X) (c: DWORDCursor) : option (X * seq BYTE) :=
+Fixpoint runWriterTm padSkip X (w: WriterTm X) (c: EVMWORDCursor) : option (X * seq BYTE) :=
   match w with
   | writerRetn x => Some (x, nil)
   | writerNext byte w =>
@@ -86,7 +86,7 @@ Fixpoint runWriterTm padSkip X (w: WriterTm X) (c: DWORDCursor) : option (X * se
   | writerCursor w => runWriterTm padSkip (w c) c
   end.
 
-Lemma runWriterTm_bindCursor padSkip X (w: DWORDCursor -> WriterTm X) (p: DWORD) :
+Lemma runWriterTm_bindCursor padSkip X (w: EVMWORDCursor -> WriterTm X) (p: EVMWORD) :
   runWriterTm padSkip (let! c = getWCursor; w c) p =
   runWriterTm padSkip (w p) p.
 Proof. done. Qed.
@@ -124,7 +124,7 @@ Proof.
     eauto 10.
 Qed.
 
-Definition runWriter padSkip T (w: Writer T) (c: DWORDCursor) (x: T): option (seq BYTE) :=
+Definition runWriter padSkip T (w: Writer T) (c: EVMWORDCursor) (x: T): option (seq BYTE) :=
   let! (_, bytes) = runWriterTm padSkip (w x) c;
   retn bytes.
 
