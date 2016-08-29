@@ -36,7 +36,7 @@ Definition next (p:BITS n) := if p == ones _ then top else mkCursor (incB p).
 Definition nextCursor (p:Cursor) :=
   if p is mkCursor pos then next pos else top.
 
-(*---------------------------------------------------------------------------
+  (*---------------------------------------------------------------------------
     Order relations on Cursor
   ---------------------------------------------------------------------------*)
 Definition ltCursor (pos1 pos2: Cursor) :=

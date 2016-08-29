@@ -431,7 +431,6 @@ Definition stringToSeqBYTE (s: string) : seq BYTE :=
 Notation "#x y" := (fromHex y) (at level 0).
 Notation "#b y" := (fromBin y) (at level 0).
 Notation "#c y" := (fromString y : BYTE) (at level 0).
-
 (*=fortytwo *)
 Example fortytwo  := #42 : BYTE.
 Example fortytwo1 := #x"2A".

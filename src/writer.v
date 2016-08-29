@@ -1,8 +1,11 @@
 (*===========================================================================
-    Syntax for writers, with instances for BYTE and DWORD
+    Syntax for writers, with instances for BYTE, WORD, DWORD, QWORD, DQWORD, 
+    ADDRESS, and EVMWORD.
   ===========================================================================*)
 From mathcomp Require Import all_ssreflect.
+
 Require Import bitsrep bitsops cursor monad monadinst cstring.
+
 Require Import Coq.Logic.FunctionalExtensionality Coq.Strings.String.
 
 Set Implicit Arguments.
