@@ -19,7 +19,7 @@ From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype tuple zmod
 
 (* We represent n-bit words by a tuple of booleans, least-significant
 bit at the head DWORDorBYTE is especially useful for multi-mode
-instructions. LSB is the leftmost bit *)
+instructions. LSB is the rightmost bit *)
 
 Definition BITS n := n.-tuple bool.
 

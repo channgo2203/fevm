@@ -2,7 +2,7 @@
     Model for the EVM memory
 
     Note that operations are partial, as not all memory is mapped. 
-	 Each memory cell is a BYTE.
+    Each memory cell is a BYTE.
   ===========================================================================*)
   
 Require Import mathcomp.ssreflect.ssreflect.
@@ -61,7 +61,7 @@ Definition updateBYTE (m : Mem) (p : PTR) (b : BYTE) : option Mem :=
    
    read m p = readerFail if memory at p in m is inaccessible for reading T
    read m p = readerWrap if we tried to read beyond the end of memory
-   read m p = readerOk x q if memory between p inclusive and q exclusive represents x : X
+   read m p = readerOk x q if memory between p inclusive and q exclusive represents x : T
  --------------------------------------------------------------------------------------------*)
 Inductive readerResult T :=
   readerOk (x : T) (q : EVMWORDCursor)
@@ -107,11 +107,10 @@ Fixpoint writeMemTm (w : WriterTm unit) (m : Mem) (pos : EVMWORDCursor) : option
         if isMapped p m then
           writeMemTm w (m!p := #0) (next p)
         else None
-      else None
-             
-      | writerCursor w =>
+      else None         
+    | writerCursor w =>
         writeMemTm (w pos) m pos
-      | writerFail =>
+    | writerFail =>
         None
   end.
 
@@ -121,6 +120,7 @@ Definition writeMem {T} (w : Writer T) (m : Mem) (pos : EVMWORDCursor) (t : T) :
 Require Import Coq.Strings.String.
 Import Ascii.
 
+(* Memory to string *)
 Fixpoint enumMemToString (xs : seq (EVMWORD * BYTE)) :=
   (if xs is (p, b)::xs then
      toHex p ++ ":=" ++ toHex b ++ ", " ++ enumMemToString xs
@@ -128,7 +128,31 @@ Fixpoint enumMemToString (xs : seq (EVMWORD * BYTE)) :=
 
 Definition memtoString (m : Mem) := enumMemToString (enumPMap m).
 
-Example m: Mem := (@EmptyPMap _ _) ! #5 := (#12 : BYTE) ! #8 := (#15 : BYTE).
+(* readerResult to string *)
+Fixpoint readerResultToString (n : nat) (rs : readerResult (BITS n)) :=
+  match rs with
+     | readerFail => ("Inaccessible memory!")%string
+     | readerWrap => ("Out of memory!")%string
+     | readerOk x q => ("Content :=" ++ toHex x)%string
+end.
+
+(* A simple unit test *)
+Example m: Mem := (@EmptyPMap _ _) ! #5 := (#12 : BYTE) ! #6 := (#10 : BYTE) ! #8 := (#15 : BYTE).
 
 Compute (memtoString m).
         
+(* Read a byte at pos 5 *)
+Example rb: readerResult BYTE := readMem readBYTE  m (#5).
+Compute (readerResultToString rb).
+(* Read a word at pos 5 *)
+Example rw: readerResult WORD := readMem readWORD m (#5).
+Compute (readerResultToString rw).
+
+(* Write a byte at pos 9 *)
+Example cm: option (EVMWORDCursor * Mem) := writeMem writeBYTE m (#6) (#9 : BYTE).
+Compute (
+    match cm with
+      | Some (c, m) => memtoString m
+      | None => ("Write error!")%string
+    end
+  ).

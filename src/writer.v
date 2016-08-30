@@ -129,7 +129,8 @@ Definition runWriter padSkip T (w: Writer T) (c: EVMWORDCursor) (x: T): option (
   retn bytes.
 
 (*---------------------------------------------------------------------------
-   Writer type class together with BYTE, WORD, DWORD and pad instances
+   Writer type class together with BYTE, WORD, DWORD, QWORD, DQWORD, 
+   ADDRESS, EVMWORD, and pad instances
   ---------------------------------------------------------------------------*)
 
 (*=writeBYTE *)
@@ -138,7 +139,7 @@ Instance writeBYTE : Writer BYTE | 0 :=
 (*=End *)
 
 (*=writeWORD *)
-Instance writeWORD : Writer WORD := fun w =>
+Instance writeWORD : Writer WORD | 0 := fun w =>
   let: (b1,b0) := split2 8 8 w in
   do! writeNext b0;
   do! writeNext b1;

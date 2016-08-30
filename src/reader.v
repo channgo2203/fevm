@@ -101,9 +101,9 @@ Qed.
 
 
 (*---------------------------------------------------------------------------
-   Reader type class together with BYTE, WORD, DWORD and pad instances
+   Reader type class together with BYTE, WORD, DWORD, QWORD, DQWORD, 
+   ADDRESS, EVMWORD, and pad instances
   ---------------------------------------------------------------------------*)
-
 (*=readBYTE *)
 Instance readBYTE : Reader BYTE | 0 :=
   readerNext (fun b => readerRetn b).
@@ -119,7 +119,7 @@ Definition readSkip : Reader unit :=
 
 (*=readWORD *)
 Definition bytesToWORD (b1 b0: BYTE) : WORD := b1 ## b0.
-Instance readWORD: Reader WORD :=
+Instance readWORD: Reader WORD | 0 :=
   let! b0 = readNext;
   let! b1 = readNext;
   retn (bytesToWORD b1 b0).
