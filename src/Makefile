@@ -1,5 +1,6 @@
 MODULES	:= common_definitions common_tactics cstring monad monadinst nathelp tuplehelp update\
-	 bitsrep bitsprops bitsops bitsopsprops cursor cursorprops pmap pmapprops reader writer mem
+	 bitsrep bitsprops bitsops bitsopsprops cursor cursorprops pmap pmapprops reader writer\
+	 mem storage
 
 VS	:= $(MODULES:%=%.v)
 
