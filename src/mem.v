@@ -31,7 +31,11 @@ Fixpoint memIs (m : Mem) (p p' : PTR) xs :=
   if xs is x::xs then m p = Some x /\ memIs m (incB p) p' xs
   else p = p'.
 
-(* Map memory region of 32 bytes at [p] with 1-bits *)
+(* Map a byte at [p] with 1-bits *)
+Definition reserveMemoryByte (m : Mem) (p : PTR) : Mem :=
+  m !p := ones 8.
+
+(* Map memory region of [c] bytes at [p] with 1-bits *)
 Definition reserveMemory (m : Mem) (p : PTR) (c : EVMWORD) : Mem :=
   bIterFrom p c (fun p m => m !p := ones 8) m.
 
@@ -43,6 +47,7 @@ Definition EVMWORDtoBytes (d : EVMWORD) : BYTE*BYTE*BYTE*BYTE*BYTE*BYTE*BYTE*BYT
   split32 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 d.
 
 Definition isMapped (p : PTR) (ms : Mem) : bool := ms p.
+
 
 (* Update EVMWORD at [p] on [m] *)
 Instance MemUpdateOpsEVMWORD : UpdateOps Mem PTR EVMWORD :=
@@ -148,11 +153,32 @@ Compute (readerResultToString rb).
 Example rw: readerResult WORD := readMem readWORD m (#5).
 Compute (readerResultToString rw).
 
-(* Write a byte at pos 9 *)
-Example cm: option (EVMWORDCursor * Mem) := writeMem writeBYTE m (#6) (#9 : BYTE).
+(* Write a byte at pos 6 *)
 Compute (
-    match cm with
+    let omem := writeMem writeBYTE m (#6) (#9 : BYTE) in 
+    match omem with
       | Some (c, m) => memtoString m
       | None => ("Write error!")%string
     end
   ).
+
+(* Write a byte at pos 9 -- error since this cell is not mapped yet *)
+Compute (
+    let omem := writeMem writeBYTE m (#9) (#12 : BYTE) in
+    match omem with
+      | Some (c, m) => memtoString m
+      | None => ("Write error!")%string
+    end
+  ).
+
+(* Test reserveMemoryByte *)
+Compute (
+    let m := reserveMemoryByte m (#9) in
+    let omem := writeMem writeBYTE m (#9) (#12 : BYTE) in
+    match omem with
+      | Some (c, m) => memtoString m
+      | None => ("Write error!")%string
+    end
+  ).
+
+

@@ -436,4 +436,6 @@ Example fortytwo  := #42 : BYTE.
 Example fortytwo1 := #x"2A".
 Example fortytwo2 := #b"00101010".
 Example fortytwo3 := #c"*".
+Example overflowbyte := #300 : BYTE.
+Compute (("Overflow: " ++ toHex overflowbyte)%string).
 (*=End *)
