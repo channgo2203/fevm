@@ -32,7 +32,7 @@ Fixpoint memIs (m : Mem) (p p' : PTR) xs :=
   else p = p'.
 
 (* Map a byte at [p] with 1-bits *)
-Definition reserveMemoryByte (m : Mem) (p : PTR) : Mem :=
+Definition reserveMemoryBYTE (m : Mem) (p : PTR) : Mem :=
   m !p := ones 8.
 
 (* Map memory region of [c] bytes at [p] with 1-bits *)
@@ -56,11 +56,21 @@ Instance MemUpdateOpsEVMWORD : UpdateOps Mem PTR EVMWORD :=
           b15,b14,b13,b12,b11,b10,b9,b8,b7,b6,b5,b4,b3,b2,b1,b0) := EVMWORDtoBytes v in
     m !p := b0 !incB p := b1 !incB(incB p) := b2 !incB(incB(incB p)) := b3 !incB(incB(incB(incB p))) := b4 !incB(incB(incB(incB(incB p)))) := b5 !incB(incB(incB(incB(incB(incB p))))) := b6 !incB(incB(incB(incB(incB(incB(incB p)))))) := b7 !incB(incB(incB(incB(incB(incB(incB(incB p))))))) := b8 !incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))) := b9 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))) := b10 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))) := b11 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))) := b12 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))) := b13 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))) := b14 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))) := b15 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))) := b16 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))) := b17 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))))) := b18 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))))) := b19 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))))))) := b20 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))))))) := b21 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))))))))) := b22 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))))))))) := b23 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))))))))))) := b24 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))))))))))) := b25 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))))))))))))) := b26 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))))))))))))) := b27 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))))))))))))))) := b28 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))))))))))))))) := b29 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p))))))))))))))))))))))))))))) := b30 !incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB(incB p)))))))))))))))))))))))))))))) := b31.
 
-(* Update EVMWORD at [p] on [m] with fixpoint *)
+(* Update BYTE at [p] on [m] *)
 Definition updateBYTE (m : Mem) (p : PTR) (b : BYTE) : option Mem :=
   if isMapped p m then Some (m !p := b)
   else None.
 
+(* Write BYTE at [p] on [m].
+   If m p is mapped, update it.
+   Otherwise, reserve a byte at p and write
+ *)
+Definition writeMemBYTE (m : Mem) (p : PTR) (b : BYTE) : Mem :=
+  if isMapped p m then
+    m !p := b
+  else
+    (reserveMemoryBYTE m p) !p := b.
+  
 (*-------------------------------------------------------------------------------------------- 
  "readers of T" type:
    
@@ -173,7 +183,7 @@ Compute (
 
 (* Test reserveMemoryByte *)
 Compute (
-    let m := reserveMemoryByte m (#9) in
+    let m := reserveMemoryBYTE m (#9) in
     let omem := writeMem writeBYTE m (#9) (#12 : BYTE) in
     match omem with
       | Some (c, m) => memtoString m

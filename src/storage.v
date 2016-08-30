@@ -33,7 +33,7 @@ Fixpoint stoIs (sto : Storage) (p p' : PTR) xs :=
   else p = p'.
 
 (* Map an evmword at [p] with 1-bits *)
-Definition reserveMemoryEVMWord (sto: Storage) (p : PTR) : Storage :=
+Definition reserveStorageEVMWORD (sto: Storage) (p : PTR) : Storage :=
   sto !p := ones 256.
 
 (* Map storage region of [c] words at [p] with 1-bits *)
@@ -41,3 +41,18 @@ Definition reserveStorage (sto : Storage) (p : PTR) (c : EVMWORD) : Storage :=
   bIterFrom p c (fun p sto => sto !p := ones 256) sto.
 
 Definition isMappedStorage (p : PTR) (sto : Storage) : bool := sto p.
+
+(* Update EVMWORD at [p] on [sto] *)
+Definition updateEVMWORD (sto : Storage) (p : PTR) (evmw : EVMWORD) : option Storage :=
+  if isMappedStorage p sto then Some (sto !p := evmw)
+  else None.
+
+(* Write EVMWORD at [p] on [sto].
+   If sto p is mapped, update it.
+   Otherwise, reserve a word at p and write
+ *)
+Definition writeStorageEVMWORD (sto : Storage) (p : PTR) (evmw : EVMWORD) : Storage :=
+  if isMappedStorage p sto then
+    sto !p := evmw
+  else
+    (reserveStorageEVMWORD sto p) !p := evmw.
