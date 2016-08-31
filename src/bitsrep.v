@@ -119,30 +119,30 @@ Identity Coercion EVMWORDtoVWORD : EVMWORD >-> VWORD.
 Notation "'nilB'" := (nil_tuple _).
 
 Definition consB {n} (b : bool) (p : BITS n) : BITS n.+1 :=
-cons_tuple b p.
+  cons_tuple b p.
 
 Definition joinlsb {n} (pair : BITS n * bool) : BITS n.+1 :=
-cons_tuple pair.2 pair.1.
+  cons_tuple pair.2 pair.1.
 
 (* Destructors *)
 Definition splitlsb {n} (p : BITS n.+1) : BITS n * bool :=
-(behead_tuple p, thead p).
+  (behead_tuple p, thead p).
 
 Definition droplsb {n} (p : BITS n.+1) : BITS n := 
-(splitlsb p).1.
+  (splitlsb p).1.
 
 (* Conversion to and from nat numbers *)
 Fixpoint fromNat {n} m : BITS n :=
-if n is _.+1 
-then joinlsb (fromNat m./2, odd m)
-else nilB.
+  if n is _.+1 then
+    joinlsb (fromNat m./2, odd m)
+  else nilB.
 
 Notation "# m" := (fromNat m) (at level 0).
 
 Arguments fromNat n m : simpl never.
 
 Definition toNat {n} (p : BITS n) :=
-foldr (fun (b : bool) n => b + n.*2) 0 p.
+  foldr (fun (b : bool) n => b + n.*2) 0 p.
 
 Coercion natAsEVMWORD := @fromNat _ : nat -> EVMWORD.
 Coercion natAsADDRESS := @fromNat _ : nat -> ADDRESS.
@@ -154,7 +154,7 @@ Coercion natAsBYTE := @fromNat _ : nat -> BYTE.
 
 (* All bits identical *)
 Definition copy n b : BITS n :=
-nseq_tuple n b.
+  nseq_tuple n b.
 
 Definition zero n := copy n false.
 
@@ -178,8 +178,9 @@ Fixpoint high n {n2} : BITS (n2+n) -> BITS n :=
 
 (* The n low bits *)
 Fixpoint low {n1} n : BITS (n+n1) -> BITS n :=
-  if n is _.+1 then fun p => let (p,b) := splitlsb p in joinlsb (low _ p, b)
-               else fun p => nilB.
+  if n is _.+1 then
+    fun p => let (p,b) := splitlsb p in joinlsb (low _ p, b)
+  else fun p => nilB.
 
 (* n1 high and n2 low bits *)
 Definition split2 n1 n2 p := (high n1 p, low n2 p).
@@ -224,22 +225,30 @@ Definition signExtend extra {n} (p: BITS n.+1) := copy extra (msb p) ## p.
 (* Truncate a signed integer by {extra} bits; return None if this would overflow *)
 Definition signTruncate extra {n} (p: BITS (n.+1 + extra)) : option (BITS n.+1) :=
   let (hi,lo) := split2 extra _ p in
-  if msb lo && (hi == ones _) || negb (msb lo) && (hi == zero _)
-  then Some lo
+  if msb lo && (hi == ones _) || negb (msb lo) && (hi == zero _) then
+    Some lo
   else None.
 
 (* Zero extend by {extra} bits *)
 Definition zeroExtend extra {n} (p: BITS n) := zero extra ## p.
 
-Coercion WORDtoDWORD := zeroExtend (n:=16) 16 : WORD -> DWORD.
 Coercion BYTEtoDWORD := zeroExtend (n:=8) 24 : BYTE -> DWORD.
+Coercion WORDtoDWORD := zeroExtend (n:=16) 16 : WORD -> DWORD.
+
+Coercion BYTEtoEVMWORD := zeroExtend (n:=8) 248 : BYTE -> EVMWORD.
+Coercion WORDtoEVMWORD := zeroExtend (n:=16) 240 : WORD -> EVMWORD.
+Coercion DWORDtoEVMWORD := zeroExtend (n:=32) 224 : DWORD -> EVMWORD.
+Coercion QWORDtoEVMWORD := zeroExtend (n:=64) 192 : QWORD -> EVMWORD.
+Coercion DQWORDtoEVMWORD := zeroExtend (n:=128) 128 : DQWORD -> EVMWORD.
+Coercion ADDRESStoEVMWORD := zeroExtend (n:=160) 96 : ADDRESS -> EVMWORD.
+
 
 (* Take m least significant bits of n-bit argument and fill with zeros if m>n *)
 Fixpoint lowWithZeroExtend m {n} : BITS n -> BITS m :=
-  if n is _.+1
-  then fun p => let (p,b) := splitlsb p in
-                if m is m'.+1 then joinlsb (@lowWithZeroExtend m' _ p, b)
-                else zero 0
+  if n is _.+1 then
+    fun p => let (p,b) := splitlsb p in
+             if m is m'.+1 then joinlsb (@lowWithZeroExtend m' _ p, b)
+             else zero 0
   else fun p => zero m.
 
 (* Truncate an unsigned integer by {extra} bits; return None if this would overflow *)

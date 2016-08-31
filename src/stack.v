@@ -57,6 +57,17 @@ Definition peekdefault (s : Stack) (dw : EVMWORD) : EVMWORD :=
   [pushARRAY] pushes an abitrary number of bytes. 
  ---------------------------------------------------------------------*)
 
+Definition pushBYTE (s : Stack) (b : BYTE) : option Stack :=
+  (* Zero extension of [b] to EVMWORD size *)
+  if (length s) < maxSize then
+    Some ((BYTEtoEVMWORD b)::s)
+  else None.
+
+Definition pushWORD (s : Stack) (w : WORD) : option Stack :=
+  if (length s) < maxSize then
+    Some ((WORDtoEVMWORD w)::s)
+  else None.
+
 Definition pushEVMWORD (s : Stack) (evmw : EVMWORD) : option Stack :=
   if (length s) < maxSize then
     Some (evmw::s)
