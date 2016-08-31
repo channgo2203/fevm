@@ -1,5 +1,5 @@
 (*===========================================================================
-    Model for the EVM memory
+    Model for the EVM memory, the memory is little endian.
 
     Note that operations are partial, as not all memory is mapped. 
     Each memory cell is a BYTE.
@@ -219,4 +219,13 @@ Compute (
     end
   ).
 
+(* Write 32 bytes *)
+Compute (
+    let m := reserveMemory m (#255) (#32 : EVMWORD) in
+    let omem := writeMem writeEVMWORD m (#255) (#255 : EVMWORD) in
+    match omem with
+      | Some (c, m) => memtoString m
+      | None => ("Write error!")%string
+    end
+  ).
 
