@@ -87,6 +87,19 @@ Implicit Arguments readerOk [T].
 Implicit Arguments readerWrap [T].
 Implicit Arguments readerFail [T].
 
+(* Read BYTE at [pos] on [m].
+   It is equivalent to using the [readMem] with [readBYTE].
+ *)
+Definition readMemBYTE (m : Mem) (pos : EVMWORDCursor) : readerResult BYTE :=
+  if pos is mkCursor p then
+    if m p is Some x then
+      readerOk x (next p)
+    else readerFail
+  else readerWrap.
+         
+(*------------------------------------------------------------------------------------------
+ read on sequences
+ ------------------------------------------------------------------------------------------*)
 Fixpoint readMem T (r : Reader T) (m : Mem) (pos : EVMWORDCursor) : readerResult T :=
   match r with
     | readerRetn x => readerOk x pos
@@ -103,11 +116,10 @@ Fixpoint readMem T (r : Reader T) (m : Mem) (pos : EVMWORDCursor) : readerResult
     | readerCursor rd =>
       readMem (rd pos) m pos
   end.
-(* Check readMem. *)
 
 (*--------------------------------------------------------------------------------------------
    writer on sequences
- ------------------------------------------------------------------------------------------- *)
+ --------------------------------------------------------------------------------------------*)
 Fixpoint writeMemTm (w : WriterTm unit) (m : Mem) (pos : EVMWORDCursor) : option (EVMWORDCursor * Mem) :=
   match w with
     | writerRetn _ => Some (pos, m)
@@ -148,20 +160,36 @@ Fixpoint readerResultToString (n : nat) (rs : readerResult (BITS n)) :=
   match rs with
      | readerFail => ("Inaccessible memory!")%string
      | readerWrap => ("Out of memory!")%string
-     | readerOk x q => ("Content :=" ++ toHex x)%string
-end.
+     | readerOk x q =>
+       if q is mkCursor p then
+         ("Next cursor:=" ++ toHex p ++ ", " ++ "Content:=" ++ toHex x)%string
+       else ("Next curspr:= Top" ++ ", " ++ "Content:=" ++ toHex x)%string
+  end.
 
-(* A simple unit test *)
+(*----------------------------------------------------------------------------------------------
+ A simple unit test 
+ ----------------------------------------------------------------------------------------------*)
 Example m: Mem := (@EmptyPMap _ _) ! #5 := (#12 : BYTE) ! #6 := (#10 : BYTE) ! #8 := (#15 : BYTE).
-
 Compute (memtoString m).
         
 (* Read a byte at pos 5 *)
-Example rb: readerResult BYTE := readMem readBYTE  m (#5).
-Compute (readerResultToString rb).
+Compute (
+    let rb := readMemBYTE m (#5) in
+    readerResultToString rb
+  ).
+
+(* Read a byte at pos 5 with [readMem] *)
+Compute (
+    let rb := readMem readBYTE m (#5) in
+    readerResultToString rb
+  ).
+
 (* Read a word at pos 5 *)
 Example rw: readerResult WORD := readMem readWORD m (#5).
-Compute (readerResultToString rw).
+Compute (
+    let rw := readMem readWORD m (#5) in
+    readerResultToString rw
+  ).
 
 (* Write a byte at pos 6 *)
 Compute (

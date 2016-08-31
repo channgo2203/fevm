@@ -1,5 +1,5 @@
 (*===============================================================================
-    Model for the EVM storage or EVM execution environment
+    Model for the EVM storage in EVM execution environment
    
     Note that operations are partial, as not all storage is mapped.
     Each storage cell is a EVMWORD - 256-bits.
@@ -9,7 +9,7 @@
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun.
 
-Require Import bitsrep bitsops cursor pmap reader writer.
+Require Import bitsrep bitsops cursor pmap reader writer mem.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -56,3 +56,23 @@ Definition writeStorageEVMWORD (sto : Storage) (p : PTR) (evmw : EVMWORD) : Stor
     sto !p := evmw
   else
     (reserveStorageEVMWORD sto p) !p := evmw.
+
+(* Read EVMWORD at [pos] on [sto].
+   It is equivalent to using the [readStorage] with [readEVMWORD].
+ *)
+Definition readStorageEVMWORD (sto : Storage) (pos : EVMWORDCursor) : readerResult EVMWORD :=
+  if pos is mkCursor p then
+    if sto p is Some x then
+      readerOk x (next p)
+    else readerFail
+  else readerWrap.
+
+
+(*------------------------------------------------------------------------------------
+ writer on sequences
+ ------------------------------------------------------------------------------------*)
+
+(*------------------------------------------------------------------------------------
+ reader on sequences
+ ------------------------------------------------------------------------------------*)
+
