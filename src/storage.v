@@ -47,15 +47,17 @@ Definition updateEVMWORD (sto : Storage) (p : PTR) (evmw : EVMWORD) : option Sto
   if isMappedStorage p sto then Some (sto !p := evmw)
   else None.
 
-(* Write EVMWORD at [p] on [sto].
+(* Write EVMWORD at [pos] on [sto].
    If sto p is mapped, update it.
    Otherwise, reserve a word at p and write
  *)
-Definition writeStorageEVMWORD (sto : Storage) (p : PTR) (evmw : EVMWORD) : Storage :=
-  if isMappedStorage p sto then
-    sto !p := evmw
-  else
-    (reserveStorageEVMWORD sto p) !p := evmw.
+Definition writeStorageEVMWORD (sto : Storage) (pos : EVMWORDCursor) (evmw : EVMWORD) : option (EVMWORDCursor * Storage) :=
+  if pos is mkCursor p then
+    if sto p is Some x then
+      Some ((next p), (sto !p := evmw))
+    else Some ((next p), ((reserveStorageEVMWORD sto p) !p := evmw))
+  else None.
+
 
 (* Read EVMWORD at [pos] on [sto].
    It is equivalent to using the [readStorage] with [readEVMWORD].
@@ -67,3 +69,38 @@ Definition readStorageEVMWORD (sto : Storage) (pos : EVMWORDCursor) : readerResu
     else readerFail
   else readerWrap.
 
+(*--------------------------------------------------------------------------------------------
+  Storage layout to string
+ --------------------------------------------------------------------------------------------*)
+Require Import Coq.Strings.String.
+Import Ascii.
+
+(* Storage to string *)
+Fixpoint enumStorageToString (xs : seq (EVMWORD * EVMWORD)) :=
+  (if xs is (p, w)::xs then
+     toHex p ++ ":=" ++ toHex w ++ ", " ++ enumStorageToString xs
+   else "")%string.
+
+Definition storagetoString (sto : Storage) := enumStorageToString (enumPMap sto).
+
+
+(*----------------------------------------------------------------------------------------------
+ A simple unit test 
+ ----------------------------------------------------------------------------------------------*)
+Example s: Storage := (@EmptyPMap _ _) ! #5 := (#12 : EVMWORD) ! #6 := (#10 : EVMWORD).
+Compute (storagetoString s).
+        
+(* Read a word at pos 5 *)
+Compute (
+    let rw := readStorageEVMWORD s (#5) in
+    readerResultToString rw
+  ).
+
+(* Write a word at pos 9 *)
+Compute (
+    let os := writeStorageEVMWORD s (#9) (#15 : EVMWORD) in 
+    match os with
+      | Some (c, s) => storagetoString s
+      | None => ("Write error!")%string
+    end
+  ).

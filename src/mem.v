@@ -60,16 +60,6 @@ Instance MemUpdateOpsEVMWORD : UpdateOps Mem PTR EVMWORD :=
 Definition updateBYTE (m : Mem) (p : PTR) (b : BYTE) : option Mem :=
   if isMapped p m then Some (m !p := b)
   else None.
-
-(* Write BYTE at [p] on [m].
-   If m p is mapped, update it.
-   Otherwise, reserve a byte at p and write
- *)
-Definition writeMemBYTE (m : Mem) (p : PTR) (b : BYTE) : Mem :=
-  if isMapped p m then
-    m !p := b
-  else
-    (reserveMemoryBYTE m p) !p := b.
   
 (*-------------------------------------------------------------------------------------------- 
  "readers of T" type:
@@ -144,6 +134,20 @@ Fixpoint writeMemTm (w : WriterTm unit) (m : Mem) (pos : EVMWORDCursor) : option
 Definition writeMem {T} (w : Writer T) (m : Mem) (pos : EVMWORDCursor) (t : T) : option (EVMWORDCursor * Mem) :=
   writeMemTm (w t) m pos.
 
+(* Write BYTE at [pos] on [m].
+   If m p is mapped, update it.
+   Otherwise, reserve a byte at p and write
+ *)
+Definition writeMemBYTE (m : Mem) (pos : EVMWORDCursor) (b : BYTE) : option (EVMWORDCursor * Mem) :=
+  if pos is mkCursor p then
+    if m p is Some x then
+      Some ((next p), (m !p := b))
+    else Some ((next p), ((reserveMemoryBYTE m p) !p := b))
+  else None.
+
+(*-------------------------------------------------------------------------------------------
+   Memory layout to string
+ -------------------------------------------------------------------------------------------*)
 Require Import Coq.Strings.String.
 Import Ascii.
 
@@ -200,7 +204,7 @@ Compute (
     end
   ).
 
-(* Write a byte at pos 9 -- error since this cell is not mapped yet *)
+(* Write a byte at pos 9 - errir since this cell is not mapped yet *)
 Compute (
     let omem := writeMem writeBYTE m (#9) (#12 : BYTE) in
     match omem with
@@ -209,10 +213,9 @@ Compute (
     end
   ).
 
-(* Test reserveMemoryByte *)
+(* Write a byte at pos 9 - succes with [writeMemBYTE] *)
 Compute (
-    let m := reserveMemoryBYTE m (#9) in
-    let omem := writeMem writeBYTE m (#9) (#12 : BYTE) in
+    let omem := writeMemBYTE m (#9) (#12 : BYTE) in
     match omem with
       | Some (c, m) => memtoString m
       | None => ("Write error!")%string
