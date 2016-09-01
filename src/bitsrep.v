@@ -123,7 +123,7 @@ Definition consB {n} (b : bool) (p : BITS n) : BITS n.+1 :=
 
 Definition joinlsb {n} (pair : BITS n * bool) : BITS n.+1 :=
   cons_tuple pair.2 pair.1.
-
+  
 (* Destructors *)
 Definition splitlsb {n} (p : BITS n.+1) : BITS n * bool :=
   (behead_tuple p, thead p).
@@ -171,6 +171,11 @@ Definition lsb {n} (b: BITS n) := head false b.
 Definition catB {n1 n2} (p1: BITS n1) (p2: BITS n2) : BITS (n2+n1) :=
   cat_tuple p2 p1.
 Notation "y ## x" := (catB y x) (right associativity, at level 60).
+
+(* Join BYTE to BITS n *)
+Definition joinBYTE {n} (pair : BITS n * BYTE) : BITS (n8+n) :=
+  cat_tuple pair.2 pair.1.
+
 
 (* The n high bits *)
 Fixpoint high n {n2} : BITS (n2+n) -> BITS n :=
@@ -230,7 +235,7 @@ Definition signTruncate extra {n} (p: BITS (n.+1 + extra)) : option (BITS n.+1) 
   else None.
 
 (* Zero extend by {extra} bits *)
-Definition zeroExtend extra {n} (p: BITS n) := zero extra ## p.
+Definition zeroExtend extra {n} (p : BITS n) := zero extra ## p.
 
 Coercion BYTEtoDWORD := zeroExtend (n:=8) 24 : BYTE -> DWORD.
 Coercion WORDtoDWORD := zeroExtend (n:=16) 16 : WORD -> DWORD.
@@ -241,7 +246,6 @@ Coercion DWORDtoEVMWORD := zeroExtend (n:=32) 224 : DWORD -> EVMWORD.
 Coercion QWORDtoEVMWORD := zeroExtend (n:=64) 192 : QWORD -> EVMWORD.
 Coercion DQWORDtoEVMWORD := zeroExtend (n:=128) 128 : DQWORD -> EVMWORD.
 Coercion ADDRESStoEVMWORD := zeroExtend (n:=160) 96 : ADDRESS -> EVMWORD.
-
 
 (* Take m least significant bits of n-bit argument and fill with zeros if m>n *)
 Fixpoint lowWithZeroExtend m {n} : BITS n -> BITS m :=
@@ -295,6 +299,7 @@ Definition slice n n1 n2 (p: BITS (n+n1+n2)) : BITS n1 :=
 
 Definition updateSlice n n1 n2 (p: BITS (n+n1+n2)) (m:BITS n1) : BITS (n+n1+n2) :=
   let: (a,b,c) := split3 n2 n1 n p in a ## m ## c.
+
 
 (*---------------------------------------------------------------------------
     Single bit operations
@@ -403,7 +408,26 @@ Fixpoint toHex {n} :=
   | _ => fun bs => let (hi,lo) := split2 _ 4 bs in appendNibbleOnString lo (toHex hi)
   end.
 
+
+(* From tuple of BYTEs to BITS n *)
+Fixpoint fromBytes (b : seq BYTE) : BITS (size b * 8) :=
+  match b with
+    | nil => #0
+    | h::t => joinBYTE ((fromBytes t), h)
+  end.
+
+(* From tuple of BYTEs to EVMWORD *)
+Definition fromBytesToEVMWORD (b : seq BYTE) : EVMWORD :=
+  let p := fromBytes b in
+  let psize := tsize p in
+  let res := (#0 :EVMWORD) in
+  res.
+  
+(*----------------------------------------------------------------------------
+ To Hex string.
+ ----------------------------------------------------------------------------*)
 Import Ascii.
+
 (*Fixpoint bytesToHex (b: seq BYTE) :=
   if b is b::bs then
   String.String (nibbleToChar (high (n2:=4) 4 b)) (
@@ -440,11 +464,21 @@ Definition stringToSeqBYTE (s: string) : seq BYTE :=
 Notation "#x y" := (fromHex y) (at level 0).
 Notation "#b y" := (fromBin y) (at level 0).
 Notation "#c y" := (fromString y : BYTE) (at level 0).
-(*=fortytwo *)
+
+
+(*-------------------------------------------------------------------------------
+ Unit test.
+ -------------------------------------------------------------------------------*)
 Example fortytwo  := #42 : BYTE.
 Example fortytwo1 := #x"2A".
 Example fortytwo2 := #b"00101010".
 Example fortytwo3 := #c"*".
 Example overflowbyte := #300 : BYTE.
 Compute (("Overflow: " ++ toHex overflowbyte)%string).
-(*=End *)
+
+Example bytes : 5.-tuple BYTE := (cons_tuple (#5:BYTE) (cons_tuple (#4:BYTE) (cons_tuple (#3:BYTE) (cons_tuple (#2:BYTE) (cons_tuple (#1:BYTE) (nil_tuple _)))))).
+Compute (bytesToHex bytes).
+Example fbytes := fromBytes (rev bytes).
+Example esize := 256 - (tsize fbytes).
+Compute (toHex (zeroExtend esize fbytes)).
+

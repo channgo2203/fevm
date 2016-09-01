@@ -2,7 +2,7 @@
     Model for the EVM stack
 
     Each item on stack is a EVMWORD - 256-bit.
- *====================================================================*)
+ =====================================================================*)
 
 
 Require Import mathcomp.ssreflect.ssreflect.
@@ -80,7 +80,7 @@ Definition pushADDRESS (s : Stack) (addr : ADDRESS) : Stack :=
   (ADDRESStoEVMWORD addr)::s.
 
 Definition pushEVMWORD (s : Stack) (evmw : EVMWORD) : Stack :=
-  evmw::s.             
+  evmw::s.
 
 
 (*--------------------------------------------------------------------
