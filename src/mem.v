@@ -6,7 +6,7 @@
   ===========================================================================*)
   
 Require Import mathcomp.ssreflect.ssreflect.
-From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun.
+From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun tuple zmodp.
 
 Require Import bitsrep bitsops cursor pmap reader writer.
 
@@ -232,3 +232,33 @@ Compute (
     end
   ).
 
+(* Write 5 bytes from the pos 0 
+   Then read the written bytes *)
+Example bytes : 5.-tuple BYTE := (cons_tuple (#5:BYTE) (cons_tuple (#4:BYTE) (cons_tuple (#3:BYTE) (cons_tuple (#2:BYTE) (cons_tuple (#1:BYTE) (nil_tuple _)))))).
+Compute (toHex (thead bytes)).
+Example m1 := reserveMemory m (#0) (#5 : EVMWORD).
+Example omem := writeMem (@writeTupleBYTE 5) m1 (#0) (bytes : 5.-tuple BYTE).
+
+Compute (
+    match omem with
+      | Some (c, m) => memtoString m
+      | None => ("Write error!")%string
+    end
+  ).
+
+(* Read 5 bytes from the pos 0 *)
+Example  rbytes :=
+  if omem is Some (c, m) then
+    readMem (@readTupleBYTE 5) m (#0)
+  else readerFail.
+
+Compute (
+    match rbytes with
+      | readerFail => ("Inaccessible memory!")%string
+      | readerWrap => ("Out of memory!")%string
+      | readerOk x q =>
+        if q is mkCursor p then
+          ("Next cursor:=" ++ toHex p ++ ", " ++ "Content:=" ++ bytesToHex x)%string
+        else ("Next curspr:= Top" ++ ", " ++ "Content:=" ++ bytesToHex x)%string
+    end
+  ).

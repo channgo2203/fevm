@@ -162,7 +162,7 @@ Definition ones n := copy n true.
 
 (*---------------------------------------------------------------------------
     Concatenation and splitting of bit strings
-  ---------------------------------------------------------------------------*)
+  --------------------------------------------------------------------------*)
 
 (* Most and least significant bits, defaulting to 0 *)
 Definition msb {n} (b: BITS n) := last false b.

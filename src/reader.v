@@ -270,6 +270,7 @@ Fixpoint readTupleBYTE (n:nat) : Reader (n.-tuple BYTE) :=
        let! bs = readTupleBYTE n';
        retn (cons_tuple b bs)
   else retn (nil_tuple _).
+
 Global Existing Instance readTupleBYTE.
 
 (* Here n is the maximum number of characters to read *)
