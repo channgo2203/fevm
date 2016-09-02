@@ -258,6 +258,10 @@ Fixpoint lowWithZeroExtend m {n} : BITS n -> BITS m :=
 Definition lowWithZeroExtendToEVMWORD {n} (p : BITS n) : EVMWORD :=
   lowWithZeroExtend 256 p.
 
+(* BITS n to BYTE and fill with zeros if n < 8 *)
+Definition lowWithZeroExtendToBYTE {n} (p : BITS n) : BYTE :=
+  lowWithZeroExtend 8 p.
+
 (* Truncate an unsigned integer by {extra} bits; return None if this would overflow *)
 Definition zeroTruncate extra {n} (p: BITS (n + extra)) : option (BITS n) :=
   let (hi,lo) := split2 extra _ p in
@@ -476,4 +480,5 @@ Example bytes : 5.-tuple BYTE := (cons_tuple (#5:BYTE) (cons_tuple (#4:BYTE) (co
 Compute (bytesToHex bytes).
 Example fbytes := fromBytes (rev bytes).
 Compute (toHex (lowWithZeroExtendToEVMWORD fbytes)).
+Compute (toHex (lowWithZeroExtendToBYTE fbytes)).
 
