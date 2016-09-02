@@ -82,6 +82,9 @@ Definition pushADDRESS (s : Stack) (addr : ADDRESS) : Stack :=
 Definition pushEVMWORD (s : Stack) (evmw : EVMWORD) : Stack :=
   evmw::s.
 
+Definition pushBytes (m : nat) (s : Stack) (bytes : m.-tuple BYTE) : Stack :=
+  let p := @fromBytes (rev bytes) in
+  (lowWithZeroExtendToEVMWORD p)::s.
 
 (*--------------------------------------------------------------------
  Pop EVMWORD, application on top element, truncation

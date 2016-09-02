@@ -176,7 +176,6 @@ Notation "y ## x" := (catB y x) (right associativity, at level 60).
 Definition joinBYTE {n} (pair : BITS n * BYTE) : BITS (n8+n) :=
   cat_tuple pair.2 pair.1.
 
-
 (* The n high bits *)
 Fixpoint high n {n2} : BITS (n2+n) -> BITS n :=
   if n2 is _.+1 then fun p => let (p,b) := splitlsb p in high _ p else fun p => p.
@@ -254,6 +253,10 @@ Fixpoint lowWithZeroExtend m {n} : BITS n -> BITS m :=
              if m is m'.+1 then joinlsb (@lowWithZeroExtend m' _ p, b)
              else zero 0
   else fun p => zero m.
+
+(* BITS n to EVMWORD and fill with zeros if n < 256 *)
+Definition lowWithZeroExtendToEVMWORD {n} (p : BITS n) : EVMWORD :=
+  lowWithZeroExtend 256 p.
 
 (* Truncate an unsigned integer by {extra} bits; return None if this would overflow *)
 Definition zeroTruncate extra {n} (p: BITS (n + extra)) : option (BITS n) :=
@@ -416,13 +419,6 @@ Fixpoint fromBytes (b : seq BYTE) : BITS (size b * 8) :=
     | h::t => joinBYTE ((fromBytes t), h)
   end.
 
-(* From tuple of BYTEs to EVMWORD *)
-Definition fromBytesToEVMWORD (b : seq BYTE) : EVMWORD :=
-  let p := fromBytes b in
-  let psize := tsize p in
-  let res := (#0 :EVMWORD) in
-  res.
-  
 (*----------------------------------------------------------------------------
  To Hex string.
  ----------------------------------------------------------------------------*)
@@ -479,6 +475,5 @@ Compute (("Overflow: " ++ toHex overflowbyte)%string).
 Example bytes : 5.-tuple BYTE := (cons_tuple (#5:BYTE) (cons_tuple (#4:BYTE) (cons_tuple (#3:BYTE) (cons_tuple (#2:BYTE) (cons_tuple (#1:BYTE) (nil_tuple _)))))).
 Compute (bytesToHex bytes).
 Example fbytes := fromBytes (rev bytes).
-Example esize := 256 - (tsize fbytes).
-Compute (toHex (zeroExtend esize fbytes)).
+Compute (toHex (lowWithZeroExtendToEVMWORD fbytes)).
 
