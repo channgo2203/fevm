@@ -428,6 +428,7 @@ Fixpoint fromBytes (b : seq BYTE) : BITS (size b * 8) :=
  ----------------------------------------------------------------------------*)
 Import Ascii.
 
+(* Bytes to Hex without spaces *)
 (*Fixpoint bytesToHex (b: seq BYTE) :=
   if b is b::bs then
   String.String (nibbleToChar (high (n2:=4) 4 b)) (
@@ -435,8 +436,9 @@ Import Ascii.
              String.String (" "%char) (
              bytesToHex bs)))
   else ""%string.
-*)
+ *)
 
+(* Bytes to Hex with spaces like 01 0A 0C *)
 Fixpoint bytesToHexAux (b: seq BYTE) res :=
   match b with b::bs =>
     bytesToHexAux bs (String.String (nibbleToChar (high (n2:=4) 4 b)) (
