@@ -17,14 +17,13 @@ From Coq
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype tuple zmodp.
 
-(* We represent n-bit words by a tuple of booleans, least-significant
-bit at the head DWORDorBYTE is especially useful for multi-mode
-instructions. LSB is the rightmost bit *)
+(* We represent n-bit words by a tuple of booleans. 
+ LSB is the leftmost bit or the head of the tuple *)
 
 Definition BITS n := n.-tuple bool.
 
 (** We define aliases for various numbers, to speed up proofs.  We use
-[.+1] to ensure convertibility after adding or subtracting 1. *)
+ [.+1] to ensure convertibility after adding or subtracting 1. *)
 
 Definition n3 := 3.
 Definition n7 := 7.
