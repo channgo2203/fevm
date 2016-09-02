@@ -116,23 +116,30 @@ Identity Coercion DQWORDtoVWORD : DQWORD >-> VWORD.
 Identity Coercion ADDRESStoVWORD : ADDRESS >-> VWORD.
 Identity Coercion EVMWORDtoVWORD : EVMWORD >-> VWORD.
 
-(* Constructors *)
+(*-----------------------------------------------------------------------
+ Constructors
+ -----------------------------------------------------------------------*)
 Notation "'nilB'" := (nil_tuple _).
 
+(* Concate 1 bit as LSB one *)
 Definition consB {n} (b : bool) (p : BITS n) : BITS n.+1 :=
   cons_tuple b p.
 
 Definition joinlsb {n} (pair : BITS n * bool) : BITS n.+1 :=
   cons_tuple pair.2 pair.1.
   
-(* Destructors *)
+(*------------------------------------------------------------------------
+  Destructors
+ ------------------------------------------------------------------------*)
 Definition splitlsb {n} (p : BITS n.+1) : BITS n * bool :=
   (behead_tuple p, thead p).
 
 Definition droplsb {n} (p : BITS n.+1) : BITS n := 
   (splitlsb p).1.
 
-(* Conversion to and from nat numbers *)
+(*------------------------------------------------------------------------
+ Conversion to and from nat numbers.
+ ------------------------------------------------------------------------*)
 Fixpoint fromNat {n} m : BITS n :=
   if n is _.+1 then
     joinlsb (fromNat m./2, odd m)
@@ -162,20 +169,17 @@ Definition zero n := copy n false.
 Definition ones n := copy n true.
 
 (*---------------------------------------------------------------------------
-    Concatenation and splitting of bit strings
-  --------------------------------------------------------------------------*)
+ Concatenation and splitting of bit strings
+ --------------------------------------------------------------------------*)
 
 (* Most and least significant bits, defaulting to 0 *)
 Definition msb {n} (b: BITS n) := last false b.
 Definition lsb {n} (b: BITS n) := head false b.
 
+(* p2 is least-significant part *)
 Definition catB {n1 n2} (p1: BITS n1) (p2: BITS n2) : BITS (n2+n1) :=
   cat_tuple p2 p1.
 Notation "y ## x" := (catB y x) (right associativity, at level 60).
-
-(* Join BYTE to BITS n *)
-Definition joinBYTE {n} (pair : BITS n * BYTE) : BITS (n8+n) :=
-  cat_tuple pair.2 pair.1.
 
 (* The n high bits *)
 Fixpoint high n {n2} : BITS (n2+n) -> BITS n :=
@@ -298,16 +302,22 @@ Definition joinNibble {n}  (p:NIBBLE) (q: BITS n) : BITS (n.+4) :=
 Notation "y ## x" := (catB y x) (right associativity, at level 60).
 
 (* Slice of bits *)
-(*
-Definition slice n n1 n2 (p: BITS (n+(n1+n2))) := low n1 (high (n1+n2) p).
-*)
-
 Definition slice n n1 n2 (p: BITS (n+n1+n2)) : BITS n1 :=
   let: (a,b,c) := split3 n2 n1 n p in b. 
 
 Definition updateSlice n n1 n2 (p: BITS (n+n1+n2)) (m:BITS n1) : BITS (n+n1+n2) :=
   let: (a,b,c) := split3 n2 n1 n p in a ## m ## c.
 
+(* Join BYTE to BITS n *)
+Definition joinBYTE {n} (pair : BITS n * BYTE) : BITS (n8+n) :=
+  cat_tuple pair.2 pair.1.
+
+(* From tuple of BYTEs to BITS n, preserve the order in b *)
+Fixpoint fromBytes (b : seq BYTE) : BITS (size b * 8) :=
+  match b with
+    | nil => #0
+    | h::t => joinBYTE ((fromBytes t), h)
+  end.
 
 (*---------------------------------------------------------------------------
     Single bit operations
@@ -416,14 +426,6 @@ Fixpoint toHex {n} :=
   | _ => fun bs => let (hi,lo) := split2 _ 4 bs in appendNibbleOnString lo (toHex hi)
   end.
 
-
-(* From tuple of BYTEs to BITS n *)
-Fixpoint fromBytes (b : seq BYTE) : BITS (size b * 8) :=
-  match b with
-    | nil => #0
-    | h::t => joinBYTE ((fromBytes t), h)
-  end.
-
 (*----------------------------------------------------------------------------
  To Hex string.
  ----------------------------------------------------------------------------*)
@@ -436,8 +438,7 @@ Import Ascii.
              String.String (nibbleToChar (low 4 b)) (
              String.String (" "%char) (
              bytesToHex bs)))
-  else ""%string.
- *)
+  else ""%string. *)
 
 (* Bytes to Hex with spaces like 01 0A 0C *)
 Fixpoint bytesToHexAux (b: seq BYTE) res :=
