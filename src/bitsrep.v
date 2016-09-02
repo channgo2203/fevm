@@ -12,13 +12,15 @@
   Proofs of properties of operations can be found in bitsopsprops.v
   ===========================================================================*)
 
-From Coq
-    Require Import ZArith.ZArith Strings.String.
+From Coq Require Import ZArith.ZArith Strings.String.
+
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype tuple zmodp.
 
 (* We represent n-bit words by a tuple of booleans. 
- LSB is the leftmost bit or the head of the tuple *)
+ LSB is the leftmost bit or the head of the tuple.
+ For example number 9 as an EVMWORD is the tuple:
+ 1001 0000 ... 0000 - 32 bytes *)
 
 Definition BITS n := n.-tuple bool.
 
