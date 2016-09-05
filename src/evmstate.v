@@ -20,12 +20,15 @@ Unset Strict Implicit.
 Import Prenex Implicits.
 
 (*= EVMState *)
-Record EVMState := mkEVMState {
-                       g : EVMWORD;
-                       pc : EVMWORD;
-                       m :> Mem;
-                       i : EVMWORD;
-                       s :> Stack}.
+Record EVMState :=
+  mkEVMState {
+      g : EVMWORD;
+      pc : EVMWORD;
+      m :> Mem;
+      i : EVMWORD;
+      s :> Stack}.
+
+(*End *)
 
                
 
