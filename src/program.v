@@ -3,7 +3,7 @@
  =====================================================================*)
 
 From mathcomp Require Import all_ssreflect.
-Require Import bitsops bitsrep instr instrsyntax.
+Require Import bitsops bitsrep instr.
 
 Require Import listhelp.
 

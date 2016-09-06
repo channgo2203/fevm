@@ -43,7 +43,7 @@ Inductive Instr :=
     (* SHA3 *)
 | SHA3
     (* Environmental Information *)
-| ADDRESS
+| GETADDRESS
 | BALANCE
 | ORIGIN
 | CALLER
@@ -189,7 +189,7 @@ Definition fromNatToInstr (n : nat) : Instr :=
     (* SHA3 *)
     | 32 => SHA3
     (* Environmental Information *)
-    | 48 => ADDRESS
+    | 48 => GETADDRESS
     | 49 => BALANCE
     | 50 => ORIGIN
     | 51 => CALLER
@@ -213,7 +213,7 @@ Definition fromNatToInstr (n : nat) : Instr :=
     | 80 => POP
     | 81 => MLOAD
     | 82 => MSTORE
-    | 83 =>MSTORE8
+    | 83 => MSTORE8
     | 84 => SLOAD
     | 85 => SSTORE
     | 86 => JUMP
