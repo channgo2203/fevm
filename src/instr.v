@@ -306,3 +306,4 @@ Definition fromNatToInstr (n : nat) : Instr :=
   end.
 
 
+Compute (fromNatToInstr 243).

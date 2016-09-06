@@ -1,6 +1,6 @@
 MODULES	:= common_definitions common_tactics DblibTactics LibTactics specific_tactics cstring monad monadinst nathelp tuplehelp listhelp update\
 	 bitsrep bitsprops bitsops bitsopsprops cursor cursorprops pmap pmapprops reader writer\
-	 mem storage stack rom state instr instrsyntax
+	 mem storage stack rom state instr instrsyntax program
 
 VS	:= $(MODULES:%=%.v)
 
