@@ -13,7 +13,7 @@
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun tuple zmodp.
 
-Require Import bitsrep bitsops cursor pmap reader writer mem stack.
+Require Import bitsrep bitsops cursor pmap reader writer mem stack instr program.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

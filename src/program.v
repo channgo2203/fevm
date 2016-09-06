@@ -16,6 +16,7 @@ Definition BYTEToOpCode (b : BYTE) : Instr :=
   let n := toNat (b : BYTE) in
   fromNatToInstr n.
 
+
 (* Unit test *)
 Compute (BYTEToOpCode (#243 : BYTE)).
 
