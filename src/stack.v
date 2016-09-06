@@ -158,13 +158,38 @@ Definition duplicate (n : nat) (s : Stack) : Stack :=
 
 
 (*-------------------------------------------------------------------
- Add operations.
+ Arithmetic operations.
  -------------------------------------------------------------------*)
 Definition add2top (s : Stack) : option Stack :=
   match s with
     | nil => None
     | _::nil => None
     | x1::x2::t => Some ((addB x1 x2)::t)
+  end.
+
+Definition mul2top (s : Stack) : option Stack :=
+  match s with
+    | nil => None
+    | _::nil => None
+    | x1::x2::t => Some ((mulB x1 x2)::t)
+  end.
+
+Definition sub2top (s : Stack) : option Stack :=
+  match s with
+    | nil => None
+    | _::nil => None
+    | x1::x2::t => Some ((subB x1 x2)::t)
+  end.
+
+Definition div2top (s : Stack) : option Stack :=
+  match s with
+    | nil => None
+    | _::nil => None
+    | x1::x2::t => match (toNat x2) with
+                      | 0 => Some ((#0:EVMWORD)::t)
+                      | _ => Some ((# (Nat.div (toNat x1) (toNat x2)) : EVMWORD)::t)
+                              
+                   end
   end.
 
 (*--------------------------------------------------------------------
