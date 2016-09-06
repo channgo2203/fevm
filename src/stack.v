@@ -9,6 +9,8 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype tuple zmodp.
 
 Require Import bitsrep bitsops.
+Require Import List.
+Import ListNotations.
 Require Import listhelp.
 
 Set Implicit Arguments.
@@ -154,6 +156,16 @@ Definition duplicate (n : nat) (s : Stack) : Stack :=
     (nth (n-1) s (#0 : EVMWORD))::s
   else s.
 
+
+(*-------------------------------------------------------------------
+ Add operations.
+ -------------------------------------------------------------------*)
+Definition add2top (s : Stack) : option Stack :=
+  match s with
+    | nil => None
+    | _::nil => None
+    | x1::x2::t => Some ((addB x1 x2)::t)
+  end.
 
 (*--------------------------------------------------------------------
  Stack layout to string.
