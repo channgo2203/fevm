@@ -17,6 +17,14 @@ Definition BYTEToOpCode (b : BYTE) : Instr :=
   fromNatToInstr n.
 
 
+(* Get BYTE at postion [pc], counting from 0 *)
+Definition getCodeAt (pc : nat) (pro : Program) : option BYTE :=
+  if (nth_ok n pro (#0 : BYTE)) then
+    Some (nth n pro (#0 : BYTE))
+  else
+    None.
+           
+  
 (* Unit test *)
 Compute (BYTEToOpCode (#243 : BYTE)).
 
