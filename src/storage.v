@@ -20,8 +20,6 @@ Import Prenex Implicits.
 Definition Storage := PMAP EVMWORD 256.
 (*= End *)
 
-Definition PTR := EVMWORD.
-Identity Coercion PTRtoEVMWORD : PTR >-> EVMWORD.
 
 (* Initialize the storage, no cell is mapped *)
 Definition initialStorage : Storage := @EmptyPMap EVMWORD 256.
