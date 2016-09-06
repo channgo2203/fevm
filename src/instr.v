@@ -306,4 +306,5 @@ Definition fromNatToInstr (n : nat) : Instr :=
   end.
 
 
+(* Unit test *)
 Compute (fromNatToInstr 243).
