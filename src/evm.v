@@ -93,7 +93,12 @@ Definition eval_LT (s1 : EVMachine) : (option EVMException) * EVMachine :=
   end.
 
 
-
+Definition eval_ISZERO (s1 : EVMachine) : (option EVMException) * EVMachine :=
+  let ores := @isZero s1.(s) in
+  match ores with
+    | None => (Some StackUnderflow, s1)
+    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+  end.
 
 
 

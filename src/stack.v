@@ -203,6 +203,21 @@ Definition lt2top (s : Stack) : option Stack :=
                    else Some ((#0 : EVMWORD)::t)
   end.
 
+Definition gt2top (s : Stack) : option Stack :=
+  match s with
+    | nil => None
+    | _::nil => None
+    | x1::x2::t => if (ltB x2 x1) then Some ((#1 : EVMWORD)::t)
+                   else Some ((#0 : EVMWORD)::t)
+  end.
+
+Definition isZero (s : Stack) : option Stack :=
+  match s with
+    | nil => None
+    | x::t => if (isZeroB x) then Some ((#1 : EVMWORD)::t)
+              else Some ((#0 : EVMWORD)::t)
+  end.
+
 
 
 (*--------------------------------------------------------------------

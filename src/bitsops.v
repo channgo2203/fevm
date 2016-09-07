@@ -123,6 +123,8 @@ Fixpoint ltB {n} : BITS n -> BITS n -> bool :=
 
 Definition leB {n} (p1 p2: BITS n) := ltB p1 p2 || (p1 == p2).
 
+Definition isZeroB {n} (p : BITS n) := (p == (#0 : BITS n)).
+
 (*---------------------------------------------------------------------------
     Multiplication
  ---------------------------------------------------------------------------*)
