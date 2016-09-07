@@ -48,15 +48,36 @@ Definition eval_STOP (s1 : EVMachine) : (option EVMException) * EVMachine :=
  Arithmetic operations.
  ---------------------------------------------------------------------------*)
 Definition eval_ADD (s1 : EVMachine) : (option EVMException) * EVMachine :=
-  let current_ere := s1.(m_ere) in
-  let current_stack := s1.(s) in
-  let ores := @add2top current_stack in
+  
+  let ores := @add2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
     | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
+Definition eval_MUL (s1 : EVMachine) : (option EVMException) * EVMachine :=
 
+  let ores := @mul2top s1.(s) in
+  match ores with
+    | None => (Some StackUnderflow, s1)
+    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+  end.
+
+Definition eval_SUB (s1 : EVMachine) : (option EVMException) * EVMachine :=
+
+  let ores := @sub2top s1.(s) in
+  match ores with
+    | None => (Some StackUnderflow, s1)
+    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+  end.
+
+Definition eval_DIV (s1 : EVMachine) : (option EVMException) * EVMachine :=
+
+  let ores := @div2top s1.(s) in
+  match ores with
+    | None => (Some StackUnderflow, s1)
+    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+  end.
 
 
 (*-----------------------------------------------------------------------------
@@ -65,6 +86,6 @@ Definition eval_ADD (s1 : EVMachine) : (option EVMException) * EVMachine :=
  results the final state or exception.
  If there exits any exception, the final state is the initialized state.
  -----------------------------------------------------------------------------*)
-(*Fixpoint EVMEvaluation (initState : EVMachine) : (option EVMException) * EVMachine :=
+(*Fixpoint EVMExecution (initState : EVMachine) : (option EVMException) * EVMachine :=
 *)
   
