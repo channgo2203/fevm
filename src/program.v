@@ -142,15 +142,21 @@ Compute (
   ).
 
 Example HexProgram := "6000355419600957005B60203560003555"%string.
+Example pro := HexToProgram HexProgram.
 
 Compute (
-    let pro := HexToProgram HexProgram in
     match pro with
-      | None => ""%string
+      | None => "Ill-formed program"%string
       | Some p => programToString p
     end
-      ).
+  ).
 
+Compute (
+    match pro with
+      | None => "Ill-formed program"%string
+      | Some p => enumProgramDecoding p
+    end
+  ).
 
 
 	
