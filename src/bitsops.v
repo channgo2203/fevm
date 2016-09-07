@@ -14,7 +14,7 @@ Import Prenex Implicits.
 
 (*---------------------------------------------------------------------------
     Increment and decrement operations
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 Fixpoint incB {n} : BITS n -> BITS n :=
   if n is n.+1
@@ -30,7 +30,7 @@ Fixpoint decB {n} : BITS n -> BITS n :=
 
 (*---------------------------------------------------------------------------
     Bitwise logical operations
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 (* Lift a unary operation on booleans to one on n-bit values *)
 Definition liftUnOp {n} op (p: BITS n): BITS n := map_tuple op p.
@@ -49,7 +49,7 @@ Definition negB {n} (p: BITS n) := incB (invB p).
 
 (*---------------------------------------------------------------------------
     Addition
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 Definition fullAdder carry b1 b2 : bool * bool :=
     match carry, b1, b2 with
@@ -76,9 +76,9 @@ Notation addB p1 p2 := (adcB false p1 p2).2.
 Notation "@ 'addB' n" := (fun p1 p2 : BITS n => addB p1 p2)
   (at level 10, n at level 8, only parsing) : fun_scope.
 
-(*(** Don't simpl unless everything is a constructor. *)
-Global Arguments adcB {!n} !carry !p1 !p2 / .*)
-(** Don't ever simpl adcB *)
+(* Donot simpl unless everything is a constructor. *)
+(* Global Arguments adcB {!n} !carry !p1 !p2 / .*)
+(* Don't ever simpl adcB *)
 Global Opaque adcB.
 
 (* Add with carry=0 and return None on overflow *)
@@ -95,7 +95,7 @@ Notation "b +# n" := (addB b #n) (at level 50, left associativity).
 
 (*---------------------------------------------------------------------------
     Subtraction
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 Definition sbbB {n} borrow (arg1 arg2: BITS n) :=
   let (carry, res) := eta_expand (adcB (~~borrow) arg1 (invB arg2)) in
@@ -105,15 +105,15 @@ Notation subB p1 p2 := (sbbB false p1 p2).2.
 Notation "@ 'subB' n" := (fun p1 p2 : BITS n => subB p1 p2)
   (at level 10, n at level 8, only parsing) : fun_scope.
 
-(** Don't ever simpl [sbbB]. *)
-(*Global Arguments sbbB {!n} !borrow !arg1 !arg2 / .*)
+(* Don't ever simpl [sbbB]. *)
+(* Global Arguments sbbB {!n} !borrow !arg1 !arg2 / .*)
 Global Opaque sbbB.
 
 Notation "b -# n" := (subB b #n) (at level 50, left associativity).
 
 (*---------------------------------------------------------------------------
     Unsigned comparison
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 Fixpoint ltB {n} : BITS n -> BITS n -> bool :=
   if n is n.+1
   then fun p1 p2 => let (q1,b1) := eta_expand (splitlsb p1) in
@@ -125,7 +125,7 @@ Definition leB {n} (p1 p2: BITS n) := ltB p1 p2 || (p1 == p2).
 
 (*---------------------------------------------------------------------------
     Multiplication
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 Fixpoint fullmulB n1 n2 : BITS n1 -> BITS n2 -> BITS (n1+n2) :=
   if n1 is n.+1 return BITS n1 -> BITS n2 -> BITS (n1+n2)
   then (fun p1 p2 => let (p,b) := eta_expand (splitlsb p1) in
@@ -140,7 +140,7 @@ Notation "b *# n" := (mulB b #n) (at level 40, left associativity).
 
 (*---------------------------------------------------------------------------
     Shift and rotation operations
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 (* Rotate right: lsb goes into msb, everything else gets shifted right *)
 Definition rorB {n} (p: BITS n.+1) : BITS n.+1 := let (p, b) := eta_expand (splitlsb p) in joinmsb (b, p).
@@ -163,7 +163,7 @@ Definition shlB {n} (p: BITS n)  := dropmsb (shlBaux p).
 
 (*---------------------------------------------------------------------------
     Iteration and ranges
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 (* Iteration *)
 Fixpoint bIter {n A} : BITS n -> (A -> A) -> A -> A :=

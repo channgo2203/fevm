@@ -193,6 +193,19 @@ Definition div2top (s : Stack) : option Stack :=
   end.
 
 (*--------------------------------------------------------------------
+ Comparison and bitwise logic operations.
+ --------------------------------------------------------------------*)
+Definition lt2top (s : Stack) : option Stack :=
+  match s with
+    | nil => None
+    | _::nil => None
+    | x1::x2::t => if (ltB x1 x2) then Some ((#1 : EVMWORD)::t)
+                   else Some ((#0 : EVMWORD)::t)
+  end.
+
+
+
+(*--------------------------------------------------------------------
  Stack layout to string.
  --------------------------------------------------------------------*)
 Require Import Coq.Strings.String.

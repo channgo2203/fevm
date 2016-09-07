@@ -79,13 +79,29 @@ Definition eval_DIV (s1 : EVMachine) : (option EVMException) * EVMachine :=
     | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
+(* TODO: SDIV, MOD, SMOD, ADDMOD, MULMOD, EXP, SIGMEXTENDED *)
+
+
+(*-----------------------------------------------------------------------------
+ Comparison amd bitwise logic operations.
+ -----------------------------------------------------------------------------*)
+Definition eval_LT (s1 : EVMachine) : (option EVMException) * EVMachine :=
+  let ores := @lt2top s1.(s) in
+  match ores with
+    | None => (Some StackUnderflow, s1)
+    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+  end.
+
+
+
+
+
 
 (*-----------------------------------------------------------------------------
  Operational Semantics of the EVM.
- The evaluation of the bytecode included in [m_ere] takes the [initState] and 
+ The evaluation of the bytecode included in [m_ere] takes the [s0] and 
  results the final state or exception.
  If there exits any exception, the final state is the initialized state.
  -----------------------------------------------------------------------------*)
-(*Fixpoint EVMExecution (initState : EVMachine) : (option EVMException) * EVMachine :=
-*)
+(*Fixpoint EVMExecution (s0 : EVMachine) : (option EVMException) * EVMachine :=*)
   
