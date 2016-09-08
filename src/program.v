@@ -267,37 +267,32 @@ Definition AssemblyDecoder (pro : Program) :=
 (*---------------------------------------------------------------------
  Unit test.
  ---------------------------------------------------------------------*)
-Example pro1 : Program := [::(#96:BYTE); (#0:BYTE); (#53:BYTE); (#84:BYTE);
-                           (#25:BYTE); (#96:BYTE); (#9:BYTE); (#87:BYTE);
-                           (#0:BYTE); (#91:BYTE); (#114:BYTE); (#0 : BYTE);
-                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
-                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
-                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
-                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
-                           (#0 : BYTE); (#32:BYTE);
-                           (#53:BYTE); (#96:BYTE); (#0:BYTE); (#53:BYTE);
-                           (#85:BYTE)].
+
+
+Example hexpro1 := "6000355419600957005B72000000000000000000000000000000000000203560003555"%string.
+
+Example pro1 := HexToProgram hexpro1.
 
 Compute (
-    let oInstr := getCodeAt (#10:EVMWORD) pro1 in
-    match oInstr with
-      | Some b => instrToString (BYTEToOpCode b)
-      | None => "Out-Of-Bound"%string 
-    end
-  ).
-
-Example HexProgram := "6000355419600957005B72000000000000000000000000000000000000203560003555"%string.
-Example pro := HexToProgram HexProgram.
-
-Compute (
-    match pro with
+    match pro1 with
       | None => "Ill-formed program"%string
       | Some p => programToString p
     end
   ).
 
 Compute (
-    match pro with
+    match pro1 with
+      | None => "Ill-formed program"%string
+      | Some p => AssemblyDecoder p
+    end
+  ).
+
+Example hexpro2 := "6060604052609b8060106000396000f360606040526000357c0100000000000000000000000000000000000000000000000000000000900480632fbff5f3146037576035565b005b605460048080359060200190919080359060200190919050506056565b005b6000600060005060008481526020019081526020016000206000505414156096578060006000506000848152602001908152602001600020600050819055505b5b505056"%string.
+
+Example pro2 := HexToProgram hexpro2.
+
+Compute (
+    match pro2 with
       | None => "Ill-formed program"%string
       | Some p => AssemblyDecoder p
     end
