@@ -13,12 +13,23 @@ Require Import common_definitions bitsops bitsrep instr.
 Definition Program := seq BYTE.
 (*=End *)
 
-(* BYTE to OpCode *)
+(*---------------------------------------------------------------------
+ Initilize.
+ ---------------------------------------------------------------------*)
+Definition initialProgram : Program :=
+  nil.
+
+
+(*--------------------------------------------------------------------
+ BYTE to OpCode.
+ -------------------------------------------------------------------*)
 Definition BYTEToOpCode (b : BYTE) : Instr :=
   fromNatToInstr (toNat b).
 
 
-(* Get BYTE at postion [pc], counting from 0 *)
+(*-------------------------------------------------------------------
+ Get BYTE at postion [pc], counting from 0.
+ -------------------------------------------------------------------*)
 Definition getCodeAt (pc : EVMWORD) (pro : Program) : option BYTE :=
   let n := toNat pc in
   if (size pro) < (n + 1) then
@@ -27,7 +38,9 @@ Definition getCodeAt (pc : EVMWORD) (pro : Program) : option BYTE :=
     Some (nth (#0 : BYTE) pro n).
 
            
-(* Add BYTE to a program *)
+(*---------------------------------------------------------------------
+ Add BYTE to a program.
+ ---------------------------------------------------------------------*)
 Definition addBYTECode (b : BYTE) (pro : Program) : Program :=
   rcons pro b.
   
