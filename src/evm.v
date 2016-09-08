@@ -37,6 +37,17 @@ Record EVMachine :=
     }.
 (*=End *)
 
+(*----------------------------------------------------------------------------
+ Initialize the EVM.
+ ----------------------------------------------------------------------------*)
+Definition initialEVM : EVMachine :=
+  mkEVMachine (#0 : EVMWORD)
+              (#0 : EVMWORD)
+              initialMemory
+              (#0 : EVMWORD)
+              initialStack
+              initialERE
+              initialStorage.
 
 (*----------------------------------------------------------------------------
  Stop.
@@ -52,7 +63,8 @@ Definition eval_ADD (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @add2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None,
+                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
 Definition eval_MUL (s1 : EVMachine) : (option EVMException) * EVMachine :=
@@ -60,7 +72,8 @@ Definition eval_MUL (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @mul2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None,
+                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
 Definition eval_SUB (s1 : EVMachine) : (option EVMException) * EVMachine :=
@@ -68,7 +81,8 @@ Definition eval_SUB (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @sub2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None,
+                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
 Definition eval_DIV (s1 : EVMachine) : (option EVMException) * EVMachine :=
@@ -76,7 +90,8 @@ Definition eval_DIV (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @div2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None,
+                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
 (* TODO: SDIV, MOD, SMOD, ADDMOD, MULMOD, EXP, SIGMEXTENDED *)
@@ -89,7 +104,8 @@ Definition eval_LT (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @lt2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None,
+                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
 
@@ -97,7 +113,8 @@ Definition eval_ISZERO (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @isZero s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None, mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None,
+                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
   end.
 
 
