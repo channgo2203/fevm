@@ -108,6 +108,8 @@ Definition eval_ISZERO (s1 : EVMachine) : (option EVMException) * EVMachine :=
 (*-----------------------------------------------------------------------------
  Environment information.
  -----------------------------------------------------------------------------*)
+(*Definition eval_CALLDATALOAD (s1 : EVMachine) : (option EVMException) * EVMachine :=
+ *)  
 
 (*-----------------------------------------------------------------------------
  Block information.
@@ -116,6 +118,8 @@ Definition eval_ISZERO (s1 : EVMachine) : (option EVMException) * EVMachine :=
 (*-----------------------------------------------------------------------------
  Stack, memory, storage, amd flow operations.
  -----------------------------------------------------------------------------*)
+(*Definition eval_PUSH1 (s1 : EVMachine) : (option EVMException) * EVMachine :=
+ *)
 
 (*-----------------------------------------------------------------------------
  Push operations.

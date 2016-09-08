@@ -9,9 +9,6 @@ Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype tuple zmodp.
 
 Require Import bitsrep bitsops.
-Require Import List.
-Import ListNotations.
-Require Import listhelp.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -19,7 +16,7 @@ Import Prenex Implicits.
 
 (* Stack is defined as a list of EVMWORDs *)
 (*=Stack *)
-Definition Stack := list EVMWORD.
+Definition Stack := seq EVMWORD.
 
 (* Initilize the stack, empty stack *)
 Definition initialStack : Stack := nil.
@@ -36,8 +33,10 @@ Definition isEmpty (s : Stack) : bool :=
 
 (* Check the stack is full *)
 Definition isFull (s : Stack) : bool :=
-  if (length s) >= maxSize then true
-  else false.
+  if (size s) >= maxSize then
+    true
+  else
+    false.
 
 (* Return a singleton stack *)
 Definition  singletonStack (evmw : EVMWORD) : Stack :=
@@ -113,7 +112,7 @@ Definition replace_top (w : EVMWORD) (s : Stack) : Stack :=
 
 (* Truncate [s] into size [n] *)
 Fixpoint truncate (n : nat) (s : Stack) : Stack :=
-  if n < (length s) then
+  if n < (size s) then
         match s with
           | _::t => truncate n t
           | _ => nil
@@ -130,7 +129,7 @@ Fixpoint truncate (n : nat) (s : Stack) : Stack :=
    and the rest *)
 
 Definition nth_separate (n : nat) (s : Stack) : Stack * Stack :=
- ((firstn n s), (skipn n s)).
+ ((take n s), (drop n s)).
 
 
 Definition exchange (n : nat) (s : Stack) : Stack :=
@@ -152,9 +151,11 @@ Definition exchange (n : nat) (s : Stack) : Stack :=
  Duplicate the nth item and push on the top of the stack.
  --------------------------------------------------------------------*)
 Definition duplicate (n : nat) (s : Stack) : Stack :=
-  if (nth_ok (n-1) s (#0 : EVMWORD)) then
-    (nth (n-1) s (#0 : EVMWORD))::s
-  else s.
+  (* if n is out-of-range *)
+  if (size s) < (n - 1) then
+    s
+  else
+    (nth (#0 : EVMWORD) s (n - 1))::s.
 
 
 (*-------------------------------------------------------------------
@@ -227,7 +228,7 @@ Require Import Coq.Strings.String.
 Import Ascii.
 
 Definition stackToString (s : Stack) :=
-  fold_left (fun x (y : EVMWORD) => (x ++ "; " ++ toHex y)%string) s ""%string.
+  foldl (fun x (y : EVMWORD) => (x ++ "; " ++ toHex y)%string) ""%string s.
 
 (*---------------------------------------------------------------------
  Unit test

@@ -31,7 +31,7 @@ Record EREnvironment :=
       (* the price of gas in the transaction *)
       Ip : EVMWORD;
       (* the input data *)
-      Id : list BYTE;
+      Id : seq BYTE;
       (* the value *)
       Iv : EVMWORD;
       (* the bytecode *)
@@ -40,7 +40,7 @@ Record EREnvironment :=
       Ih : EVMWORD;
       
       (* sub-state *)
-      As : list ADDRESS;
+      As : seq ADDRESS;
       Al : LOGEntry;
       Ar : EVMWORD;
 
