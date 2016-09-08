@@ -210,8 +210,25 @@ Definition eval_ISZERO (s1 : EVMachine) : (option EVMException) * EVMachine :=
 (*-----------------------------------------------------------------------------
  Environment information.
  -----------------------------------------------------------------------------*)
-(*Definition eval_CALLDATALOAD (s1 : EVMachine) : (option EVMException) * EVMachine :=
- *)  
+Definition eval_CALLDATALOAD (s1 : EVMachine) : (option EVMException) * EVMachine :=
+  let oindex := peek s1.(s) in
+  match oindex with
+    | None => (Some StackUnderflow, s1)
+    | Some i => let index := toNat i in 
+                let Id := s1.(ere).(Id) in
+                if (size Id) < (index + 31) then
+                  (None, updatePC (incB s1.(pc)) (updateStack (replace_top (#0 : EVMWORD) s1.(s)) s1))
+                else
+                  (* Get a word at [index] to [index + 31] in Id *)
+                  let dataword := take (index + 31) (drop (index - 1) Id) in
+                  let evmw := lowWithZeroExtendToEVMWORD (fromBytes dataword) in
+                  (None, updatePC (incB s1.(pc)) (updateStack (replace_top evmw s1.(s)) s1))
+  end.
+
+Definition eval_CALLDATASIZE (s1 : EVMachine) : (option EVMException) * EVMachine :=
+  (None, updatePC (incB s1.(pc))
+                  (updateStack (pushEVMWORD s1.(s) (fromNat (size s1.(ere).(Id)) : EVMWORD)) s1)
+  ).
 
 (*-----------------------------------------------------------------------------
  Block information.
@@ -250,5 +267,11 @@ Definition eval_ISZERO (s1 : EVMachine) : (option EVMException) * EVMachine :=
  results the final state or exception.
  If there exits any exception, the final state is the initialized state.
  -----------------------------------------------------------------------------*)
-(*Fixpoint EVMExecution (s0 : EVMachine) : (option EVMException) * EVMachine :=*)
+(*
+Fixpoint EVMExecution (s0 : EVMachine) : (option EVMException) * EVMachine :=
+*)
   
+
+(*-----------------------------------------------------------------------------
+ Ethereum Virtual Machine (EVM) layout to string.
+ -----------------------------------------------------------------------------*)
