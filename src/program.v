@@ -115,133 +115,133 @@ Fixpoint enumProgramDecoding (pro : Program) :=
        | PUSH3 => if (size pro1) < 3 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 3 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ enumProgramDecoding (drop 3 pro1)
 
        | PUSH4 => if (size pro1) < 4 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 4 pro1)) ++ " " ++ enumProgramDecoding (drop 4 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 4 pro1)) ++ enumProgramDecoding (drop 4 pro1)
 
        | PUSH5 => if (size pro1) < 5 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 5 pro1)) ++ " " ++ enumProgramDecoding (drop 5 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 5 pro1)) ++ enumProgramDecoding (drop 5 pro1)
 
        | PUSH6 => if (size pro1) < 6 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 6 pro1)) ++ " " ++ enumProgramDecoding (drop 6 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 6 pro1)) ++ enumProgramDecoding (drop 6 pro1)
 
-       | PUSH3 => if (size pro1) < 3 then
+       | PUSH7 => if (size pro1) < 7 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 7 pro1)) ++ " " ++ enumProgramDecoding (drop 7 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 7 pro1)) ++ enumProgramDecoding (drop 7 pro1)
 
-       | PUSH3 => if (size pro1) < 3 then
+       | PUSH8 => if (size pro1) < 8 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 8 pro1)) ++ " " ++ enumProgramDecoding (drop 8 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 8 pro1)) ++ enumProgramDecoding (drop 8 pro1)
 
-       | PUSH3 => if (size pro1) < 3 then
+       | PUSH9 => if (size pro1) < 9 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 9 pro1)) ++ " " ++ enumProgramDecoding (drop 9 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 9 pro1)) ++ enumProgramDecoding (drop 9 pro1)
 
-       | PUSH3 => if (size pro1) < 3 then
+       | PUSH10 => if (size pro1) < 10 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 10 pro1)) ++ " " ++ enumProgramDecoding (drop 10 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 10 pro1)) ++ enumProgramDecoding (drop 10 pro1)
 
-       | PUSH3 => if (size pro1) < 3 then
+       | PUSH11 => if (size pro1) < 11 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 11 pro1)) ++ " " ++ enumProgramDecoding (drop 11 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 11 pro1)) ++ enumProgramDecoding (drop 11 pro1)
 
-       | PUSH3 => if (size pro1) < 3 then
+       | PUSH12 => if (size pro1) < 12 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 12 pro1)) ++ " " ++ enumProgramDecoding (drop 12 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 12 pro1)) ++ enumProgramDecoding (drop 12 pro1)
 
-       | PUSH3 => if (size pro1) < 3 then
+       | PUSH13 => if (size pro1) < 13 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 13 pro1)) ++ " " ++ enumProgramDecoding (drop 13 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 13 pro1)) ++ enumProgramDecoding (drop 13 pro1)
+       | PUSH14 => if (size pro1) < 14 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 14 pro1)) ++ " " ++ enumProgramDecoding (drop 14 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 14 pro1)) ++ enumProgramDecoding (drop 14 pro1)
+       | PUSH15 => if (size pro1) < 15 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 15 pro1)) ++ " " ++ enumProgramDecoding (drop 15 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 15 pro1)) ++ enumProgramDecoding (drop 15 pro1)
+       | PUSH16 => if (size pro1) < 16 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 16 pro1)) ++ " " ++ enumProgramDecoding (drop 16 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 16 pro1)) ++ enumProgramDecoding (drop 16 pro1)
+       | PUSH17 => if (size pro1) < 17 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 17 pro1)) ++ " " ++ enumProgramDecoding (drop 17 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 17 pro1)) ++ enumProgramDecoding (drop 17 pro1)
+       | PUSH18 => if (size pro1) < 18 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 18 pro1)) ++ " " ++ enumProgramDecoding (drop 18 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 18 pro1)) ++ enumProgramDecoding (drop 18 pro1)
+       | PUSH19 => if (size pro1) < 19 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 19 pro1)) ++ " " ++ enumProgramDecoding (drop 19 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 19 pro1)) ++ enumProgramDecoding (drop 19 pro1)
+       | PUSH20 => if (size pro1) < 20 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 20 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 20 pro1)) ++ enumProgramDecoding (drop 20 pro1)
+       | PUSH21 => if (size pro1) < 21 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 21 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 21 pro1)) ++ enumProgramDecoding (drop 21 pro1)
+       | PUSH22 => if (size pro1) < 22 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 22 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 22 pro1)) ++ enumProgramDecoding (drop 22 pro1)
+       | PUSH23 => if (size pro1) < 23 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 23 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 23 pro1)) ++ enumProgramDecoding (drop 23 pro1)
+       | PUSH24 => if (size pro1) < 24 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 24 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 24 pro1)) ++ enumProgramDecoding (drop 24 pro1)
+       | PUSH25 => if (size pro1) < 25 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 25 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 25 pro1)) ++ enumProgramDecoding (drop 25 pro1)
+       | PUSH26 => if (size pro1) < 26 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 26 pro1)
-       | PUSH3 => if (size pro1) < 3 then
+                    (instrToString i) ++ " " ++ (programToString (take 26 pro1)) ++ enumProgramDecoding (drop 26 pro1)
+       | PUSH27 => if (size pro1) < 27 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 3 pro1)) ++ " " ++ enumProgramDecoding (drop 27 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 27 pro1)) ++ enumProgramDecoding (drop 27 pro1)
        | PUSH28 => if (size pro1) < 28 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 28 pro1)) ++ " " ++ enumProgramDecoding (drop 28 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 28 pro1)) ++ enumProgramDecoding (drop 28 pro1)
        | PUSH29 => if (size pro1) < 29 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 29 pro1)) ++ " " ++ enumProgramDecoding (drop 29 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 29 pro1)) ++ enumProgramDecoding (drop 29 pro1)
        | PUSH30 => if (size pro1) < 30 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 30 pro1)) ++ " " ++ enumProgramDecoding (drop 30 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 30 pro1)) ++ enumProgramDecoding (drop 30 pro1)
        | PUSH31 => if (size pro1) < 31 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 31 pro1)) ++ " " ++ enumProgramDecoding (drop 31 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 31 pro1)) ++ enumProgramDecoding (drop 31 pro1)
        | PUSH32 => if (size pro1) < 32 then
                     "Ill-formed program"
                   else
-                    (instrToString i) ++ " " ++ (programToString (take 32 pro1)) ++ " " ++ enumProgramDecoding (drop 32 pro1)
+                    (instrToString i) ++ " " ++ (programToString (take 32 pro1)) ++ enumProgramDecoding (drop 32 pro1)
        
        
        | _ => (instrToString i) ++ " " ++ enumProgramDecoding pro1
@@ -250,25 +250,33 @@ Fixpoint enumProgramDecoding (pro : Program) :=
      "")%string.
 
 
+Definition AssemblyDecoder (pro : Program) :=
+  enumProgramDecoding pro.
+
                                      
 (*---------------------------------------------------------------------
  Unit test.
  ---------------------------------------------------------------------*)
 Example pro1 : Program := [::(#96:BYTE); (#0:BYTE); (#53:BYTE); (#84:BYTE);
                            (#25:BYTE); (#96:BYTE); (#9:BYTE); (#87:BYTE);
-                           (#0:BYTE); (#91:BYTE); (#96:BYTE); (#32:BYTE);
+                           (#0:BYTE); (#91:BYTE); (#114:BYTE); (#0 : BYTE);
+                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
+                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
+                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
+                           (#0 : BYTE); (#0 : BYTE); (#0 : BYTE); (#0 : BYTE);
+                           (#0 : BYTE); (#32:BYTE);
                            (#53:BYTE); (#96:BYTE); (#0:BYTE); (#53:BYTE);
                            (#85:BYTE)].
 
 Compute (
-    let oInstr := getCodeAt (#2:EVMWORD) pro1 in
+    let oInstr := getCodeAt (#10:EVMWORD) pro1 in
     match oInstr with
       | Some b => instrToString (BYTEToOpCode b)
       | None => "Out-Of-Bound"%string 
     end
   ).
 
-Example HexProgram := "6000355419600957005B60203560003555"%string.
+Example HexProgram := "6000355419600957005B72000000000000000000000000000000000000203560003555"%string.
 Example pro := HexToProgram HexProgram.
 
 Compute (
@@ -281,7 +289,7 @@ Compute (
 Compute (
     match pro with
       | None => "Ill-formed program"%string
-      | Some p => enumProgramDecoding p
+      | Some p => AssemblyDecoder p
     end
   ).
 
