@@ -32,8 +32,8 @@ Record EVMachine :=
       i : EVMWORD;
       s :> Stack;
       (* external environment *)
-      m_ere : EREnvironment;
-      m_storage : Storage
+      ere : EREnvironment;
+      sto : Storage
     }.
 (*=End *)
 
@@ -50,6 +50,97 @@ Definition initialEVM : EVMachine :=
               initialStorage.
 
 (*----------------------------------------------------------------------------
+ Update available gas.
+ ----------------------------------------------------------------------------*)
+Definition updateGas (newGas : EVMWORD) (s1 : EVMachine) : EVMachine :=
+  mkEVMachine newGas
+              s1.(pc)
+              s1.(m)
+              s1.(i)
+              s1.(s)
+              s1.(ere)
+              s1.(sto).
+
+
+(*----------------------------------------------------------------------------
+ Update PC.
+ ----------------------------------------------------------------------------*)
+Definition updatePC (newPC : EVMWORD) (s1 : EVMachine) : EVMachine :=
+  mkEVMachine s1.(g)
+              newPC
+              s1.(m)
+              s1.(i)
+              s1.(s)
+              s1.(ere)
+              s1.(sto).
+
+
+(*----------------------------------------------------------------------------
+ Update memory.
+ ----------------------------------------------------------------------------*)
+Definition updateMem (newMem : Mem) (s1 : EVMachine) : EVMachine :=
+  mkEVMachine s1.(g)
+              s1.(pc)
+              newMem
+              s1.(i)
+              s1.(s)
+              s1.(ere)
+              s1.(sto).
+
+
+(*----------------------------------------------------------------------------
+ Update active memory.
+ ----------------------------------------------------------------------------*)
+Definition updateActiveMem (newActiveMem : EVMWORD) (s1 : EVMachine) : EVMachine :=
+  mkEVMachine s1.(g)
+              s1.(pc)
+              s1.(m)
+              newActiveMem
+              s1.(s)
+              s1.(ere)
+              s1.(sto).
+
+
+(*----------------------------------------------------------------------------
+ Update stack.
+ ----------------------------------------------------------------------------*)
+Definition updateStack (newStack : Stack) (s1 : EVMachine) : EVMachine :=
+  mkEVMachine s1.(g)
+              s1.(pc)
+              s1.(m)
+              s1.(i)
+              newStack
+              s1.(ere)
+              s1.(sto).
+
+
+(*----------------------------------------------------------------------------
+ Update ERE.
+ ----------------------------------------------------------------------------*)
+Definition updateERE (newERE : EREnvironment) (s1 : EVMachine) : EVMachine :=
+  mkEVMachine s1.(g)
+              s1.(pc)
+              s1.(m)
+              s1.(i)
+              s1.(s)
+              newERE
+              s1.(sto).
+
+
+(*----------------------------------------------------------------------------
+ Update Storage.
+ ----------------------------------------------------------------------------*)
+Definition updateStorage (newStorage : Storage) (s1 : EVMachine) : EVMachine :=
+  mkEVMachine s1.(g)
+              s1.(pc)
+              s1.(m)
+              s1.(i)
+              s1.(s)
+              s1.(ere)
+              newStorage.
+
+
+(*----------------------------------------------------------------------------
  Stop.
  ----------------------------------------------------------------------------*)
 Definition eval_STOP (s1 : EVMachine) : (option EVMException) * EVMachine :=
@@ -63,8 +154,7 @@ Definition eval_ADD (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @add2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None,
-                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None, updatePC (incB s1.(pc)) (updateStack next_stack s1))
   end.
 
 Definition eval_MUL (s1 : EVMachine) : (option EVMException) * EVMachine :=
@@ -72,8 +162,7 @@ Definition eval_MUL (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @mul2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None,
-                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None, updatePC (incB s1.(pc)) (updateStack next_stack s1))
   end.
 
 Definition eval_SUB (s1 : EVMachine) : (option EVMException) * EVMachine :=
@@ -81,8 +170,7 @@ Definition eval_SUB (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @sub2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None,
-                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None, updatePC (incB s1.(pc)) (updateStack next_stack s1))
   end.
 
 Definition eval_DIV (s1 : EVMachine) : (option EVMException) * EVMachine :=
@@ -90,8 +178,7 @@ Definition eval_DIV (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @div2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None,
-                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None, updatePC (incB s1.(pc)) (updateStack next_stack s1))
   end.
 
 (* TODO: SDIV, MOD, SMOD, ADDMOD, MULMOD, EXP, SIGMEXTENDED *)
@@ -104,8 +191,7 @@ Definition eval_LT (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @lt2top s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None,
-                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None, updatePC (incB s1.(pc)) (updateStack next_stack s1))
   end.
 
 
@@ -113,8 +199,7 @@ Definition eval_ISZERO (s1 : EVMachine) : (option EVMException) * EVMachine :=
   let ores := @isZero s1.(s) in
   match ores with
     | None => (Some StackUnderflow, s1)
-    | Some next_stack => (None,
-                          mkEVMachine s1.(g) (incB s1.(pc)) s1.(m) s1.(i) next_stack s1.(m_ere) s1.(m_storage))
+    | Some next_stack => (None, updatePC (incB s1.(pc)) (updateStack next_stack s1))
   end.
 
 
