@@ -90,15 +90,9 @@ Definition programToString (pro : Program) :=
  for well-formed one first. 
  From Bytecode to OpCode.
  ---------------------------------------------------------------------*)
-(* PUSH decoding. [pro] is the rest of program after PUSH *)
-Definition PUSHDecoding (n : nat) (pro : Program) : option (Program * Program) :=
-  if (size pro) < n then
-    None
-  else
-    Some ((take n pro), (drop n pro)).
 
-  
-Fixpoint enumProgramDecoding (pro : Program) :=
+(* The trivial implementation. However, it may helps the Proof more efficient *)
+(* Fixpoint enumProgramDecoding (pro : Program) :=
   (if pro is b1::pro1 then
      let i := BYTEToOpCode b1 in
      match i with
@@ -246,6 +240,22 @@ Fixpoint enumProgramDecoding (pro : Program) :=
        
        | _ => (instrToString i) ++ " " ++ enumProgramDecoding pro1
      end
+   else
+     "")%string.
+ *)
+
+Fixpoint enumProgramDecoding (pro : Program) :=
+  (if pro is b1::pro1 then
+     let i_nat := toNat b1 in
+     (* b1 is PUSH instruction *)
+     if (i_nat > 95) && (i_nat < 128) then
+       if (size pro1) < (i_nat - 95) then
+         "Ill-formed program"
+       else
+         (instrToString (BYTEToOpCode b1)) ++ " " ++ (programToString (take (i_nat - 95) pro1)) ++ enumProgramDecoding (drop (i_nat - 95) pro1)
+     (* other instruction *)
+     else
+       (instrToString (BYTEToOpCode b1)) ++ " " ++ enumProgramDecoding pro1
    else
      "")%string.
 
