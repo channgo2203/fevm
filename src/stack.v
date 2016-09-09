@@ -227,7 +227,7 @@ Definition isZero (s : Stack) : option Stack :=
 Require Import Coq.Strings.String.
 Import Ascii.
 
-Definition stackToString (s : Stack) :=
+Definition stacktoString (s : Stack) :=
   foldl (fun x (y : EVMWORD) => (x ++ "; " ++ toHex y)%string) ""%string s.
 
 (*---------------------------------------------------------------------
@@ -235,10 +235,10 @@ Definition stackToString (s : Stack) :=
  ---------------------------------------------------------------------*)
 Example s := (pushEVMWORD (pushEVMWORD (pushEVMWORD (pushEVMWORD (pushEVMWORD (initialStack) (#1:EVMWORD)) (#2:EVMWORD)) (#3:EVMWORD)) (#4:EVMWORD)) (#5:EVMWORD)).
 
-Compute (stackToString s).
+Compute (stacktoString s).
 
-Compute (stackToString (nth_separate 3 s).1).
-Compute (stackToString (nth_separate 3 s).2).
+Compute (stacktoString (nth_separate 3 s).1).
+Compute (stacktoString (nth_separate 3 s).2).
 
-Compute (stackToString (exchange 3 s)).
-Compute (stackToString (duplicate 6 s)).
+Compute (stacktoString (exchange 3 s)).
+Compute (stacktoString (duplicate 6 s)).

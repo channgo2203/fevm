@@ -287,3 +287,46 @@ Definition updateIe (newIe : EVMWORD) (e : EREnvironment) : EREnvironment :=
                   e.(Al) 
                   e.(Ar) 
                   newIe.
+
+(*--------------------------------------------------------------------------------------------
+ ERE to string.
+ --------------------------------------------------------------------------------------------*)
+Require Import Coq.Strings.String.
+Import Ascii.
+
+(* LOGEntry to string *)
+Definition logentrytoString (loge : LOGEntry) :=
+  (
+    "(" ++ (toHex loge.(a)) ++ "," ++ (evmwordsToHex loge.(t)) ++ "," ++ (bytesToHex loge.(logm)) ++ ")"
+  )%string.
+
+
+(* sequence of LOGEntry (Al) to string *)
+Fixpoint altoString (al : seq LOGEntry) :=
+  (
+    if al is a::al then
+      logentrytoString a ++ "; " ++ altoString al
+    else
+      ""
+  )%string.
+
+
+Definition eretoString (eres : EREnvironment) :=
+  (
+    "(Ia: " ++ (toHex eres.(Ia)) ++
+            ",Io: " ++ (toHex eres.(Io)) ++
+            ",Is: " ++ (toHex eres.(Is)) ++
+            ",Ip: " ++ (toHex eres.(Ip)) ++
+            ",Id: " ++ (bytesToHex eres.(Id)) ++
+            ",Iv: " ++ (toHex eres.(Iv)) ++
+            ",Ib: " ++ (programToString eres.(Ib)) ++
+            ",Ih: " ++ (toHex eres.(Ih)) ++
+            ",As: " ++ (addressesToHex eres.(As)) ++
+            ",Al: " ++ (altoString eres.(Al)) ++
+            ",Ar: " ++ (toHex eres.(Ar)) ++
+            ",Ie: " ++ (toHex eres.(Ie)) ++ ")"
+  )%string.
+
+
+                               
+                               

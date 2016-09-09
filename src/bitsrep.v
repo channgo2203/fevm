@@ -321,7 +321,7 @@ Fixpoint fromBytes (b : seq BYTE) : BITS (size b * 8) :=
 
 (*---------------------------------------------------------------------------
     Single bit operations
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 (* Booleans are implicitly coerced to one-bit words, useful in combination with ## *)
 Coercion singleBit b : BITS 1 := joinlsb (nilB, b).
@@ -341,7 +341,7 @@ Definition setBit {n} (p: BITS n) i b := setBitAux i b p.
 
 (*---------------------------------------------------------------------------
     Efficient conversion to and from Z
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 Definition toPosZ {n} (p: BITS n) :=
   foldr (fun b z => if b then Zsucc (Zdouble z) else Zdouble z) Z0 p.
@@ -374,7 +374,7 @@ Definition fromZ {n} (z:Z) : BITS n :=
 
 (*---------------------------------------------------------------------------
     Conversion to and from 'Z_(2^n)
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 
 Definition toZp {n} (p: BITS n) : 'Z_(2^n) := inZp (toNat p).
 Definition fromZp {n} (z: 'Z_(2^n)) : BITS n := fromNat z.
@@ -385,7 +385,7 @@ Definition toZpAux {m n} (p:BITS n) : 'Z_(2^m) := inZp (toNat p).
 
 (*---------------------------------------------------------------------------
     Support for hexadecimal notation
-  ---------------------------------------------------------------------------*)
+ ---------------------------------------------------------------------------*)
 Section HexStrings.
 Import Ascii.
 
@@ -393,30 +393,41 @@ Definition charToNibble c : NIBBLE :=
   fromNat (findex 0 (String c EmptyString) "0123456789ABCDEF0123456789abcdef").
 Definition charToBit c : bool := ascii_dec c "1".
 
-(*=fromBin *)
+(*---------------------------------------------------------------------------
+ from Binary string to BITS n 
+ ---------------------------------------------------------------------------*)
 Fixpoint fromBin s : BITS (length s) :=
   if s is String c s
   then joinmsb (charToBit c, fromBin s) else #0.
-(*=End *)
 
-(*=fromHex *)
+
+(*--------------------------------------------------------------------------
+ from Hex string to BITS n
+ --------------------------------------------------------------------------*)
 Fixpoint fromHex s : BITS (length s * 4) :=
   if s is String c s
   then joinNibble (charToNibble c) (fromHex s) else #0.
-(*=End *)
 
+(*--------------------------------------------------------------------------
+ from character string to BITS n
+ --------------------------------------------------------------------------*)
 Fixpoint fromString s : BITS (length s * 8) :=
   if s is String c s return BITS (length s * 8)
   then fromString s ## fromNat (n:=8) (nat_of_ascii c) else nilB.
 
+(*-------------------------------------------------------------------------*)
 Definition nibbleToChar (n: NIBBLE) :=
   match String.get (toNat n) "0123456789ABCDEF" with None => " "%char | Some c => c end.
 
+(*-------------------------------------------------------------------------*)
 Definition appendNibbleOnString n s :=
   (s ++ String.String (nibbleToChar n) EmptyString)%string.
 
 End HexStrings.
 
+(*--------------------------------------------------------------------------
+ from BITS n to Hex string
+ --------------------------------------------------------------------------*)
 Fixpoint toHex {n} :=
   match n return BITS n -> string with
   | 0 => fun bs => EmptyString
@@ -426,29 +437,11 @@ Fixpoint toHex {n} :=
   | _ => fun bs => let (hi,lo) := split2 _ 4 bs in appendNibbleOnString lo (toHex hi)
   end.
 
+
 (*----------------------------------------------------------------------------
- To Hex string.
+ from sequences of BYTEs, ADDRESSes, and EVMWORDs to Hex strings.
  ----------------------------------------------------------------------------*)
 Import Ascii.
-
-(* Bytes to Hex without spaces *)
-(*Fixpoint bytesToHex (b: seq BYTE) :=
-  if b is b::bs then
-  String.String (nibbleToChar (high (n2:=4) 4 b)) (
-             String.String (nibbleToChar (low 4 b)) (
-             String.String (" "%char) (
-             bytesToHex bs)))
-  else ""%string. *)
-
-(* Bytes to Hex with spaces like 01 0A 0C *)
-Fixpoint bytesToHexAux (b: seq BYTE) res :=
-  match b with b::bs =>
-    bytesToHexAux bs (String.String (nibbleToChar (high (n2:=4) 4 b)) (
-             String.String (nibbleToChar (low 4 b)) (
-             String.String (" "%char) res)))
-  | nil => res end.
-
-Definition bytesToHex b := bytesToHexAux (rev b) ""%string.
 
 (* Convert an ASCII character (from the standard Coq library) to a BYTE *)
 Definition charToBYTE (c: ascii) : BYTE :=
@@ -456,11 +449,11 @@ Definition charToBYTE (c: ascii) : BYTE :=
   [tuple a0;a1;a2;a3;a4;a5;a6;a7].
 
 (* Convert an ASCII string to a tuple of BYTEs... *)
-Fixpoint stringToTupleBYTE (s: string) : (length s).-tuple BYTE :=
+Fixpoint stringToTupleBYTE (s : string) : (length s).-tuple BYTE :=
   if s is String c s then cons_tuple (charToBYTE c) (stringToTupleBYTE s)
   else nil_tuple _.
 
-(* ...which is easily coerced to a sequence *)
+(* Which is easily coerced to a sequence *)
 Definition stringToSeqBYTE (s: string) : seq BYTE :=
   stringToTupleBYTE s.
 
@@ -468,6 +461,45 @@ Definition stringToSeqBYTE (s: string) : seq BYTE :=
 Notation "#x y" := (fromHex y) (at level 0).
 Notation "#b y" := (fromBin y) (at level 0).
 Notation "#c y" := (fromString y : BYTE) (at level 0).
+
+(* BYTEs to Hex with spaces like 01 0A 0C *)
+Fixpoint bytesToHexAux_Char (b : seq BYTE) (res : string) :=
+  match b with b::bs =>
+    bytesToHexAux_Char bs (String.String (nibbleToChar (high (n2:=4) 4 b)) (
+             String.String (nibbleToChar (low 4 b)) (
+             String.String (" "%char) res)))
+  | nil => res end.
+
+Fixpoint bytesToHexAux (b : seq BYTE) (res : string) :=
+  match b with
+    | b::bs => bytesToHexAux bs ((toHex b) ++ " " ++ res)
+    | nil => res
+  end.
+
+               
+Definition bytesToHex b :=
+  bytesToHexAux b ""%string.
+
+
+(* ADDRESSes to Hex with spaces *)
+Fixpoint addressesToHexAux (a : seq ADDRESS) (res : string) :=
+  match a with
+    | x::xs => addressesToHexAux xs ((toHex x) ++ " " ++ res)
+    | nil => res
+  end.
+
+Definition addressesToHex a :=
+  addressesToHexAux a ""%string.
+
+(* EVMWORDs to Hex with spaces *)
+Fixpoint evmwordsToHexAux (evmw : seq EVMWORD) (res : string) :=
+  match evmw with
+    | x::xs => evmwordsToHexAux xs ((toHex x) ++ " " ++ res)
+    | nil => res
+  end.
+
+Definition evmwordsToHex evmw :=
+  evmwordsToHexAux evmw ""%string.
 
 
 (*-------------------------------------------------------------------------------
@@ -480,9 +512,19 @@ Example fortytwo3 := #c"*".
 Example overflowbyte := #300 : BYTE.
 Compute (("Overflow: " ++ toHex overflowbyte)%string).
 
-Example bytes : 5.-tuple BYTE := (cons_tuple (#5:BYTE) (cons_tuple (#4:BYTE) (cons_tuple (#3:BYTE) (cons_tuple (#2:BYTE) (cons_tuple (#1:BYTE) (nil_tuple _)))))).
-Compute (bytesToHex bytes).
-Example fbytes := fromBytes (rev bytes).
-Compute (toHex (lowWithZeroExtendToEVMWORD fbytes)).
-Compute (toHex (lowWithZeroExtendToBYTE fbytes)).
+(* tuple of 5 BYTEs *)
+Example bs : 5.-tuple BYTE := [tuple (#5:BYTE); (#4:BYTE); (#3:BYTE); (#2:BYTE); (#1:BYTE)].
+Compute (bytesToHex (rev bs)).
+
+Example fbs := fromBytes (rev bs).
+Compute (toHex (lowWithZeroExtendToEVMWORD fbs)).
+Compute (toHex (lowWithZeroExtendToBYTE fbs)).
+
+(* tuple of 5 ADDRESSes *)
+Example adds : 5.-tuple ADDRESS := [tuple (#5:ADDRESS); (#4:ADDRESS); (#3:ADDRESS); (#2:ADDRESS); (#1:ADDRESS)].
+Compute (addressesToHex (rev adds)).
+
+(* tuple of 5 EVMWORDs *)
+Example ws : 5.-tuple EVMWORD := [tuple (#5:EVMWORD); (#4:EVMWORD); (#3:EVMWORD); (#2:EVMWORD); (#1:EVMWORD)].
+Compute (evmwordsToHex (rev ws)).
 

@@ -275,3 +275,27 @@ Fixpoint EVMExecution (s0 : EVMachine) : (option EVMException) * EVMachine :=
 (*-----------------------------------------------------------------------------
  Ethereum Virtual Machine (EVM) layout to string.
  -----------------------------------------------------------------------------*)
+Require Import Coq.Strings.String.
+Import Ascii.
+
+Definition evmtoString (evms : EVMachine) :=
+  (
+    "(Gas available: " ++ toHex evms.(g) ++
+
+    ",PC: " ++ toHex evms.(pc) ++
+
+    ",Memory: " ++ memtoString evms.(m) ++
+
+    ",Active Memory: " ++ toHex evms.(i) ++
+
+    ",Stack: " ++ stacktoString evms.(s) ++
+
+    ",External Running Environment: " ++ eretoString evms.(ere) ++
+
+    ",Storage: " ++ storagetoString evms.(sto) ++ ")"
+  )%string.
+
+
+
+                                                                                                                                                      
+                                     
