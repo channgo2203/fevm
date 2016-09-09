@@ -6,7 +6,7 @@
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun tuple zmodp.
 
-Require Import bitsrep bitsops cursor pmap reader writer mem stack instr program.
+Require Import common_definitions exceptions bitsrep bitsops cursor pmap reader writer mem stack instr program.
 
 
 (*=Log topic *)
@@ -187,7 +187,7 @@ Definition updateIv (newIv : EVMWORD) (e : EREnvironment) : EREnvironment :=
 
 (*---------------------------------------------------------------------------------------------
  Update Ib.
- Notive that it replaces the whole sequence of BYTE in Ib.
+ Notice that it replaces the whole sequence of BYTE in Ib.
  ---------------------------------------------------------------------------------------------*)
 Definition updateIb (newIb : Program) (e : EREnvironment) : EREnvironment :=
   mkEREnvironment e.(Ia) 

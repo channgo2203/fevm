@@ -6,21 +6,13 @@
 Require Import mathcomp.ssreflect.ssreflect.
 From mathcomp Require Import ssrfun ssrbool eqtype ssrnat seq fintype finfun tuple zmodp.
 
-Require Import bitsrep bitsops cursor pmap reader writer mem stack storage instr program ere.
+Require Import exceptions bitsrep bitsops cursor pmap reader writer mem stack storage instr program ere.
+
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Import Prenex Implicits.
 
-(*= EVM Exception *)
-Inductive EVMException :=
-| BreakPointHit
-| BadInstruction
-| BadJumpDestination
-| OutOfGas
-| OutOfStack
-| StackUnderflow.
-(*=End *)
 
 (*=EVM *)
 Record EVMachine :=
@@ -140,6 +132,50 @@ Definition updateStorage (newStorage : Storage) (s1 : EVMachine) : EVMachine :=
               newStorage.
 
 
+(*-----------------------------------------------------------------------------
+ Load the code to be executed into ERE.
+ [s] is bytecode compiled from the compiler in Hexadecimal string. If s is not 
+ well-formed program then throw an exception and revert to original state [m].
+ -----------------------------------------------------------------------------*)
+Require Import Coq.Strings.String.
+Import Ascii.
+
+Definition loadProgram (s : string) (m : EVMachine) : (option EVMException) * EVMachine :=
+  match (hexToProgram s) with
+    | (None, None) => (None, m)
+    | (Some e, _) => (Some e, m)
+    | (_, Some p) => (None, (updateERE (updateIb p m.(ere)) m))
+  end.
+
+
+(*-----------------------------------------------------------------------------
+ Ethereum Virtual Machine (EVM) layout to string.
+ -----------------------------------------------------------------------------*)
+Require Import Coq.Strings.String.
+Import Ascii.
+
+Definition evmtoString (evms : EVMachine) :=
+  (
+    "(Gas available: " ++ toHex evms.(g) ++
+
+    ",PC: " ++ toHex evms.(pc) ++
+
+    ",Memory: " ++ memtoString evms.(m) ++
+
+    ",Active Memory: " ++ toHex evms.(i) ++
+
+    ",Stack: " ++ stacktoString evms.(s) ++
+
+    ",External Running Environment: " ++ eretoString evms.(ere) ++
+
+    ",Storage: " ++ storagetoString evms.(sto) ++ ")"
+  )%string.
+
+
+
+(*----------------------------------------------------------------------------
+ EVM Operations.
+ ----------------------------------------------------------------------------*)
 (*----------------------------------------------------------------------------
  Stop.
  ----------------------------------------------------------------------------*)
@@ -271,29 +307,6 @@ Definition eval_CALLDATASIZE (s1 : EVMachine) : (option EVMException) * EVMachin
 Fixpoint EVMExecution (s0 : EVMachine) : (option EVMException) * EVMachine :=
 *)
   
-
-(*-----------------------------------------------------------------------------
- Ethereum Virtual Machine (EVM) layout to string.
- -----------------------------------------------------------------------------*)
-Require Import Coq.Strings.String.
-Import Ascii.
-
-Definition evmtoString (evms : EVMachine) :=
-  (
-    "(Gas available: " ++ toHex evms.(g) ++
-
-    ",PC: " ++ toHex evms.(pc) ++
-
-    ",Memory: " ++ memtoString evms.(m) ++
-
-    ",Active Memory: " ++ toHex evms.(i) ++
-
-    ",Stack: " ++ stacktoString evms.(s) ++
-
-    ",External Running Environment: " ++ eretoString evms.(ere) ++
-
-    ",Storage: " ++ storagetoString evms.(sto) ++ ")"
-  )%string.
 
 
 

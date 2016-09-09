@@ -1,4 +1,4 @@
-MODULES	:= common_definitions common_tactics DblibTactics LibTactics cstring monad monadinst nathelp tuplehelp update\
+MODULES	:= common_definitions exceptions common_tactics DblibTactics LibTactics cstring monad monadinst nathelp tuplehelp update\
 	 bitsrep bitsprops bitsops bitsopsprops cursor cursorprops pmap pmapprops reader writer\
 	 mem storage stack instr program ere evm
 
