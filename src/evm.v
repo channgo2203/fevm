@@ -175,6 +175,8 @@ Definition evmtoString (evms : EVMachine) :=
 
 (*----------------------------------------------------------------------------
  EVM Operations.
+ Evaluating each instruction will make the machine to take the corresponding 
+ transition from one state to the next state.
  ----------------------------------------------------------------------------*)
 (*----------------------------------------------------------------------------
  Stop.
@@ -298,13 +300,14 @@ Definition eval_CALLDATASIZE (s1 : EVMachine) : (option EVMException) * EVMachin
 
 
 (*-----------------------------------------------------------------------------
- Operational Semantics of the EVM.
- The evaluation of the bytecode included in [m_ere] takes the [s0] and 
- results the final state or exception.
- If there exits any exception, the final state is the initialized state.
+ We define the operational semantics of a single instruction 
  -----------------------------------------------------------------------------*)
-(*
-Fixpoint EVMExecution (s0 : EVMachine) : (option EVMException) * EVMachine :=
+(*Fixpoint EVMExecutionAux (s : EVMachine) (instr_list : Program) : (option EVMException) * EVMachine :=
+  match instr_list with
+    | nil => (None, s)
+    | instr::instrs => match instr with
+                       end
+  end.
 *)
   
 
